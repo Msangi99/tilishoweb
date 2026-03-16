@@ -23,5 +23,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@tilishosafari.co.tz',
             'password' => bcrypt('admin123'),
         ]);
+
+        $this->call(BusRouteSeeder::class);
     }
 }
