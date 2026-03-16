@@ -112,12 +112,11 @@ class ApiParcelController extends Controller
     }
 
     /**
-     * Get available buses for selection.
+     * Get all buses for selection (regardless of status).
      */
     public function getBuses()
     {
-        $buses = Bus::where('status', 'active')
-            ->with('route')
+        $buses = Bus::with('route')
             ->orderBy('plate_number')
             ->get()
             ->map(function($bus) {
@@ -126,6 +125,7 @@ class ApiParcelController extends Controller
                     'plate_number' => $bus->plate_number,
                     'model' => $bus->model ?? 'N/A',
                     'capacity' => $bus->capacity ?? 0,
+                    'status' => $bus->status,
                     'route_id' => $bus->route_id,
                     'route_name' => $bus->route ? $bus->route->from . ' → ' . $bus->route->to : 'No Route',
                     'drivers' => $bus->drivers,
