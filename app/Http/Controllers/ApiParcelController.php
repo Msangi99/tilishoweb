@@ -12,15 +12,26 @@ class ApiParcelController extends Controller
 {
     /**
      * Get parcels created by the authenticated user (staff).
+     * Optional query: date (Y-m-d) to filter by travel_date; default is today.
      */
     public function myParcels(Request $request)
     {
         $user = $request->user();
-        
-        $parcels = Parcel::where('created_by', $user->id)
-            ->with(['bus', 'scannedBy'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $date = $request->query('date');
+        if ($date !== null && $date !== '') {
+            $request->validate(['date' => 'date_format:Y-m-d']);
+        }
+
+        $query = Parcel::where('created_by', $user->id)
+            ->with(['bus', 'scannedBy']);
+
+        if ($date) {
+            $query->whereDate('travel_date', $date);
+        } else {
+            $query->whereDate('travel_date', Carbon::today()->toDateString());
+        }
+
+        $parcels = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return response()->json([
             'status' => 'success',

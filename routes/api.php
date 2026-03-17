@@ -12,6 +12,7 @@ Route::post('/login', [ApiAuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     // Auth routes
     Route::get('/user', [ApiAuthController::class, 'user']);
+    Route::patch('/user', [ApiAuthController::class, 'updateProfile']);
     Route::post('/logout', [ApiAuthController::class, 'logout']);
     
     // Dashboard route
