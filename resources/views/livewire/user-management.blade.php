@@ -129,7 +129,7 @@
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="scale-100 opacity-100 translate-y-0"
              x-transition:leave-end="scale-95 opacity-0 -translate-y-4"
-             class="bg-white w-full max-w-sm max-h-[70vh] rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col">
+             class="bg-white w-full max-w-sm max-h-[60vh] rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col">
             
             <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
                 <div>
@@ -141,7 +141,7 @@
                 </button>
             </div>
 
-            <form wire:submit.prevent="saveUser" class="p-6 space-y-4 overflow-y-auto custom-scrollbar bg-slate-50">
+            <form wire:submit.prevent="saveUser" class="p-4 space-y-3 overflow-y-auto custom-scrollbar bg-slate-50">
                 <!-- Success Alert -->
                 @if (session()->has('message'))
                     <div class="p-3 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl flex items-center gap-2 text-xs font-bold mb-3">
