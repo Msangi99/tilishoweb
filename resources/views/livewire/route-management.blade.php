@@ -28,7 +28,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-1.5" wire:ignore>
                             <label class="text-xs font-semibold text-slate-700 px-0.5">Origin (From)</label>
-                            <select id="select-from" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-md focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900">
+                            <select id="select-from" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                                 <option value="">Select Origin...</option>
                                 @foreach($locations as $loc)
                                     <option value="{{ $loc }}" {{ $from == $loc ? 'selected' : '' }}>{{ $loc }}</option>
@@ -38,7 +38,7 @@
                         </div>
                         <div class="space-y-1.5" wire:ignore>
                             <label class="text-xs font-semibold text-slate-700 px-0.5">Destination (To)</label>
-                            <select id="select-to" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-md focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900">
+                            <select id="select-to" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                                 <option value="">Select Destination...</option>
                                 @foreach($locations as $loc)
                                     <option value="{{ $loc }}" {{ $to == $loc ? 'selected' : '' }}>{{ $loc }}</option>
@@ -50,7 +50,7 @@
 
                     <div class="space-y-1.5">
                         <label class="text-xs font-semibold text-slate-700 px-0.5">Intermediate Stations</label>
-                        <textarea wire:model="stations" rows="3" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-md focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-300" placeholder="e.g. Chalinze, Segera, Korogwe... (separate with commas)"></textarea>
+                        <textarea wire:model="stations" rows="3" class="w-full px-4 py-2.5 rounded-md border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="e.g. Chalinze, Segera, Korogwe... (separate with commas)"></textarea>
                         <p class="text-[9px] text-slate-400 px-0.5 mt-1 font-medium italic">Separate each station name using a comma (,)</p>
                         @error('stations') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>

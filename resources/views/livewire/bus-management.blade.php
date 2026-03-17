@@ -28,12 +28,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                         <label class="text-xs font-semibold text-slate-700 px-0.5">Bus Number (Plate)</label>
-                        <input wire:model="plate_number" type="text" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900" placeholder="e.g. T 123 ABC">
+                        <input wire:model="plate_number" type="text" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="e.g. T 123 ABC">
                         @error('plate_number') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-xs font-semibold text-slate-700 px-0.5">Assigned Route</label>
-                        <select wire:model="route_id" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900">
+                        <select wire:model="route_id" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                             <option value="">--- Not Assigned ---</option>
                             @foreach($routes as $rt)
                                 <option value="{{ $rt->id }}">{{ $rt->from }} → {{ $rt->to }}</option>
