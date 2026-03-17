@@ -129,7 +129,7 @@
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="scale-100 opacity-100 translate-y-0"
              x-transition:leave-end="scale-95 opacity-0 -translate-y-4"
-             class="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
+             class="bg-white w-full max-w-md max-h-[70vh] rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200 flex flex-col">
             
             <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
                 <div>
@@ -141,7 +141,7 @@
                 </button>
             </div>
 
-            <form wire:submit.prevent="saveRoute" class="p-8 space-y-4">
+            <form wire:submit.prevent="saveRoute" class="p-8 space-y-4 overflow-y-auto custom-scrollbar">
                 <!-- Success Alert -->
                 @if (session()->has('message'))
                     <div class="p-3 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl flex items-center gap-2 text-xs font-bold mb-3">
@@ -232,7 +232,7 @@
         </div>
     </div>
 
-    <!-- Custom Pagination Styling -->
+    <!-- Custom Pagination & Scrollbar Styling -->
     <style>
         .pagination { display: flex; gap: 0.25rem; }
         .page-link { 
@@ -256,5 +256,9 @@
             color: #0f172a;
             border-color: #cbd5e1;
         }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
     </style>
 </div>

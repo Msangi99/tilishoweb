@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Parcel;
 use App\Models\Bus;
 use App\Models\BusRoute;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -227,21 +228,56 @@ class ApiParcelController extends Controller
     {
         $buses = Bus::with('route')
             ->orderBy('plate_number')
-            ->get()
-            ->map(function($bus) {
-                return [
-                    'id' => $bus->id,
-                    'plate_number' => $bus->plate_number,
-                    'model' => $bus->model ?? 'N/A',
-                    'capacity' => $bus->capacity ?? 0,
-                    'status' => $bus->status,
-                    'route_id' => $bus->route_id,
-                    'route_name' => $bus->route ? $bus->route->from . ' → ' . $bus->route->to : 'No Route',
-                    'drivers' => $bus->drivers,
-                    'conductors' => $bus->conductors,
-                    'attendants' => $bus->attendants,
-                ];
-            });
+            ->get();
+
+        // Resolve all unique staff IDs to User names so the mobile app can
+        // show "Juma - driver" instead of just numeric IDs.
+        $allStaffIds = [];
+        foreach ($buses as $bus) {
+            $allStaffIds = array_merge(
+                $allStaffIds,
+                is_array($bus->drivers) ? $bus->drivers : [],
+                is_array($bus->conductors) ? $bus->conductors : [],
+                is_array($bus->attendants) ? $bus->attendants : [],
+            );
+        }
+        $allStaffIds = array_values(array_unique($allStaffIds));
+
+        $usersById = $allStaffIds
+            ? User::whereIn('id', $allStaffIds)->get()->keyBy('id')
+            : collect();
+
+        $buses = $buses->map(function ($bus) use ($usersById) {
+            $mapCrew = function ($ids, string $role) use ($usersById) {
+                if (! is_array($ids)) {
+                    return [];
+                }
+
+                return collect($ids)->map(function ($id) use ($usersById, $role) {
+                    $user = $usersById[$id] ?? null;
+
+                    return [
+                        'id' => $id,
+                        'name' => $user?->name ?? (string) $id,
+                        'role' => $role,
+                    ];
+                })->all();
+            };
+
+            return [
+                'id' => $bus->id,
+                'plate_number' => $bus->plate_number,
+                'model' => $bus->model ?? 'N/A',
+                'capacity' => $bus->capacity ?? 0,
+                'status' => $bus->status,
+                'route_id' => $bus->route_id,
+                'route_name' => $bus->route ? $bus->route->from . ' → ' . $bus->route->to : 'No Route',
+                // Mobile app expects arrays; we now send objects with names
+                'drivers' => $mapCrew($bus->drivers, 'driver'),
+                'conductors' => $mapCrew($bus->conductors, 'conductor'),
+                'attendants' => $mapCrew($bus->attendants, 'attendant'),
+            ];
+        });
 
         return response()->json([
             'status' => 'success',

@@ -121,7 +121,7 @@
          style="display: none;"
          x-transition>
         
-        <div class="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="bg-white w-full max-w-xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[70vh]">
             <!-- Header -->
             <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/30 shrink-0">
                 <div>

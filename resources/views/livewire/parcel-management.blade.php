@@ -171,17 +171,15 @@
     </div>
 
     <!-- Registration Modal -->
-    <div x-show="showModal" class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div x-show="showModal" @click="showModal = false; $wire.cancelEdit()" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"></div>
-
-            <div x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200">
-                <div class="px-10 pt-10 pb-6 border-b border-slate-100">
+    <div x-show="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        <div class="w-full max-w-xl max-h-[70vh] bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden flex flex-col">
+            <div x-show="showModal" class="flex-1 flex flex-col">
+                <div class="px-8 pt-8 pb-4 border-b border-slate-100">
                     <h3 class="text-2xl font-black text-slate-900 tracking-tight">{{ $editingParcelId ? 'Edit Parcel' : 'Register New Parcel' }}</h3>
                     <p class="text-[11px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-2">Enter shipment details below</p>
                 </div>
 
-                <form wire:submit="saveParcel" class="p-10 space-y-8">
+                <form wire:submit="saveParcel" class="p-8 space-y-6 overflow-y-auto custom-scrollbar">
                     <!-- Sender and Receiver Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Sender Section -->
