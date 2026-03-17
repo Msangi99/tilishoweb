@@ -10,8 +10,9 @@
         </button>
     </div>
 
-    <!-- Inline Create/Edit Form -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <!-- Inline Create/Edit Form (centered, 80% width max) -->
+    <div class="w-full flex justify-center">
+        <div class="w-[80%] max-w-4xl bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
             <div>
                 <h3 class="text-sm font-bold text-slate-900">{{ $editingBusId ? 'Revise Fleet Asset' : 'Register New Asset' }}</h3>
@@ -126,6 +127,7 @@
                     </button>
                 </div>
             </form>
+        </div>
         </div>
     </div>
 

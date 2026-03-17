@@ -1,13 +1,72 @@
-<div class="space-y-6" x-data="{ showModal: false }" @open-route-modal.window="showModal = true" @route-saved.window="showModal = false">
+<div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-2xl font-bold text-slate-900 font-inter">Manage Routes</h2>
             <p class="text-sm text-slate-500">Define and manage bus routes and their stations.</p>
         </div>
-        <button @click="showModal = true; $wire.cancelEdit()" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
+        <button wire:click="cancelEdit" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-            Add New Route
+            {{ $editingRouteId ? 'Cancel Edit' : 'Add New Route' }}
         </button>
+    </div>
+
+    <!-- Inline Create/Edit Form (centered, 80% width max) -->
+    <div class="w-full mx-auto flex justify-center">
+        <div class="w-[80%] max-w-4xl">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">{{ $editingRouteId ? 'Edit Bus Route' : 'Add New Route' }}</h3>
+                        <p class="text-[11px] text-slate-500 font-medium">Configure origin, destination and stop points.</p>
+                    </div>
+                    @if (session()->has('message'))
+                        <span class="text-[11px] font-semibold text-emerald-600">{{ session('message') }}</span>
+                    @endif
+                </div>
+
+                <form wire:submit.prevent="saveRoute" class="p-6 space-y-4 bg-slate-50">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1.5" wire:ignore>
+                            <label class="text-xs font-semibold text-slate-700 px-0.5">Origin (From)</label>
+                            <select id="select-from" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-md focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900">
+                                <option value="">Select Origin...</option>
+                                @foreach($locations as $loc)
+                                    <option value="{{ $loc }}" {{ $from == $loc ? 'selected' : '' }}>{{ $loc }}</option>
+                                @endforeach
+                            </select>
+                            @error('from') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="space-y-1.5" wire:ignore>
+                            <label class="text-xs font-semibold text-slate-700 px-0.5">Destination (To)</label>
+                            <select id="select-to" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-md focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900">
+                                <option value="">Select Destination...</option>
+                                @foreach($locations as $loc)
+                                    <option value="{{ $loc }}" {{ $to == $loc ? 'selected' : '' }}>{{ $loc }}</option>
+                                @endforeach
+                            </select>
+                            @error('to') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-semibold text-slate-700 px-0.5">Intermediate Stations</label>
+                        <textarea wire:model="stations" rows="3" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-md focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-300" placeholder="e.g. Chalinze, Segera, Korogwe... (separate with commas)"></textarea>
+                        <p class="text-[9px] text-slate-400 px-0.5 mt-1 font-medium italic">Separate each station name using a comma (,)</p>
+                        @error('stations') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="pt-4 flex gap-3">
+                        <button type="button" wire:click="cancelEdit" class="flex-1 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-md text-xs font-bold transition-all border border-slate-200">
+                            Discard
+                        </button>
+                        <button type="submit" class="flex-2 px-8 py-3 bg-slate-900 hover:bg-slate-850 text-white rounded-md text-xs font-bold transition-all shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2">
+                            <span wire:loading.remove wire:target="saveRoute">{{ $editingRouteId ? 'Update Route' : 'Establish Route' }}</span>
+                            <div wire:loading wire:target="saveRoute" class="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- DataTable Inspired Container -->
@@ -108,130 +167,6 @@
                 {{ $routes->links() }}
             </div>
         </div>
-    </div>
-
-    <!-- Create/Edit Route Modal (Popup) -->
-    <div x-show="showModal" 
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-[2px]"
-         style="display: none;">
-        
-        <div @click.away="showModal = false; $wire.cancelEdit()" 
-             x-show="showModal"
-             x-transition:enter="transition ease-out duration-300 transform"
-             x-transition:enter-start="scale-95 opacity-0 -translate-y-4"
-             x-transition:enter-end="scale-100 opacity-100 translate-y-0"
-             x-transition:leave="transition ease-in duration-200 transform"
-             x-transition:leave-start="scale-100 opacity-100 translate-y-0"
-             x-transition:leave-end="scale-95 opacity-0 -translate-y-4"
-             class="bg-white w-full max-w-md max-h-[70vh] rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200 flex flex-col">
-            
-            <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
-                <div>
-                    <h3 class="text-lg font-black text-slate-900">{{ $editingRouteId ? 'Edit Bus Route' : 'Add New Route' }}</h3>
-                    <p class="text-[10px] text-slate-500 font-medium mt-0.5">Configure network origin, destination and stop points.</p>
-                </div>
-                <button @click="showModal = false; $wire.cancelEdit()" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-full transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-            </div>
-
-            <form wire:submit.prevent="saveRoute" class="p-8 space-y-4 overflow-y-auto custom-scrollbar">
-                <!-- Success Alert -->
-                @if (session()->has('message'))
-                    <div class="p-3 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl flex items-center gap-2 text-xs font-bold mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle-2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
-                        {{ session('message') }}
-                    </div>
-                @endif
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1.5" wire:ignore>
-                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">Origin (From)</label>
-                        <select id="select-from" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
-                            <option value="">Select Origin...</option>
-                            @foreach($locations as $loc)
-                                <option value="{{ $loc }}" {{ $from == $loc ? 'selected' : '' }}>{{ $loc }}</option>
-                            @endforeach
-                        </select>
-                        @error('from') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="space-y-1.5" wire:ignore>
-                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">Destination (To)</label>
-                        <select id="select-to" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
-                            <option value="">Select Destination...</option>
-                            @foreach($locations as $loc)
-                                <option value="{{ $loc }}" {{ $to == $loc ? 'selected' : '' }}>{{ $loc }}</option>
-                            @endforeach
-                        </select>
-                        @error('to') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                    </div>
-                </div>
-
-                <script>
-                    $(document).ready(function() {
-                        function initSelect2() {
-                            $('#select-from').select2({
-                                width: '100%',
-                                placeholder: 'Select Origin...',
-                                allowClear: true
-                            }).on('change', function (e) {
-                                @this.set('from', e.target.value);
-                            });
-
-                            $('#select-to').select2({
-                                width: '100%',
-                                placeholder: 'Select Destination...',
-                                allowClear: true
-                            }).on('change', function (e) {
-                                @this.set('to', e.target.value);
-                            });
-                        }
-
-                        initSelect2();
-
-                        window.addEventListener('open-route-modal', event => {
-                            setTimeout(() => {
-                                // Re-initialize to ensure it's fresh
-                                initSelect2();
-                                // Set values from Livewire state
-                                $('#select-from').val(@this.get('from')).trigger('change.select2');
-                                $('#select-to').val(@this.get('to')).trigger('change.select2');
-                            }, 50);
-                        });
-                        
-                        // Sync values when Route is saved (reset)
-                        window.addEventListener('route-saved', event => {
-                             $('#select-from, #select-to').val(null).trigger('change.select2');
-                        });
-                    });
-                </script>
-
-                <div class="space-y-1.5">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">Intermediate Stations</label>
-                    <textarea wire:model="stations" rows="3" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="e.g. Chalinze, Segera, Korogwe... (separate with commas)"></textarea>
-                    <p class="text-[9px] text-slate-400 px-1 mt-1 font-medium italic">Separate each station name using a comma (,)</p>
-                    @error('stations') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                </div>
-
-                <div class="pt-4 flex gap-3">
-                    <button type="button" @click="showModal = false; $wire.cancelEdit()" class="flex-1 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl text-xs font-bold transition-all border border-slate-200">
-                        Discard
-                    </button>
-                    <button type="submit" class="flex-2 px-8 py-3 bg-slate-900 hover:bg-slate-850 text-white rounded-xl text-xs font-bold transition-all shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2">
-                        <span wire:loading.remove wire:target="saveRoute">{{ $editingRouteId ? 'Update Route' : 'Establish Route' }}</span>
-                        <div wire:loading wire:target="saveRoute" class="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Custom Pagination & Scrollbar Styling -->
     <style>
         .pagination { display: flex; gap: 0.25rem; }
