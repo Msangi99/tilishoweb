@@ -23,6 +23,14 @@ class Parcel extends Model
         'travel_date',
         'start_travel_time',
         'end_travel_time',
+        'transported_by_id',
+        'transported_by_name',
+        'transported_bus_id',
+        'transported_route',
+        'transported_at',
+        'received_by_id',
+        'received_by_name',
+        'received_at',
     ];
 
     protected static function boot()
@@ -49,6 +57,16 @@ class Parcel extends Model
     public function scannedBy()
     {
         return $this->belongsTo(User::class, 'scanned_by');
+    }
+
+    public function transportedBy()
+    {
+        return $this->belongsTo(User::class, 'transported_by_id');
+    }
+
+    public function receivedBy()
+    {
+        return $this->belongsTo(User::class, 'received_by_id');
     }
 
     public function bus()

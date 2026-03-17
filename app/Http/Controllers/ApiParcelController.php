@@ -100,22 +100,89 @@ class ApiParcelController extends Controller
      */
     public function scanParcel(Request $request)
     {
-        $user = $request->user();
-        
         $validated = $request->validate([
             'tracking_number' => 'required|string|exists:parcels,tracking_number',
         ]);
 
         $parcel = Parcel::where('tracking_number', $validated['tracking_number'])->first();
-        
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'parcel' => $parcel->fresh(['bus', 'scannedBy']),
+            ],
+        ]);
+    }
+
+    /**
+     * Assign transporter using current authenticated staff and their assigned bus.
+     */
+    public function assignTransporter(Request $request)
+    {
+        $user = $request->user();
+        $validated = $request->validate([
+            'tracking_number' => 'required|string|exists:parcels,tracking_number',
+        ]);
+
+        $parcel = Parcel::where('tracking_number', $validated['tracking_number'])->first();
+        $bus = $user->assignedBus();
+
+        if (! $bus) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Hakuna basi lililopangiwa kwa mtumiaji huyu',
+            ], 400);
+        }
+
+        $routeName = $bus->route ? $bus->route->from.' → '.$bus->route->to : null;
+
         $parcel->update([
-            'scanned_by' => $user->id,
-            'status' => 'scanned',
+            'transported_by_id' => $user->id,
+            'transported_by_name' => $user->name,
+            'transported_bus_id' => $bus->id,
+            'transported_route' => $routeName,
+            'transported_at' => now(),
+            'status' => 'in-transit',
         ]);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Parcel scanned successfully',
+            'message' => 'Usafirishaji umehifadhiwa',
+            'data' => [
+                'parcel' => $parcel->fresh(['bus', 'scannedBy']),
+            ],
+        ]);
+    }
+
+    /**
+     * Assign receiver using current authenticated staff.
+     */
+    public function assignReceiver(Request $request)
+    {
+        $user = $request->user();
+        $validated = $request->validate([
+            'tracking_number' => 'required|string|exists:parcels,tracking_number',
+        ]);
+
+        $parcel = Parcel::where('tracking_number', $validated['tracking_number'])->first();
+
+        if (! $parcel->transported_at) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Parcel haijakabidhiwa kwa usafirishaji bado',
+            ], 400);
+        }
+
+        $parcel->update([
+            'received_by_id' => $user->id,
+            'received_by_name' => $user->name,
+            'received_at' => now(),
+            'status' => 'received',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Parcel imepokelewa',
             'data' => [
                 'parcel' => $parcel->fresh(['bus', 'scannedBy']),
             ],
