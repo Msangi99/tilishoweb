@@ -170,17 +170,21 @@
                                 <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest">Dereva (Drivers)</h4>
                                 <span class="text-[10px] text-slate-400 font-medium">Search & select users</span>
                             </div>
-                            <select
-                                wire:model="drivers"
-                                multiple
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm text-slate-900"
-                            >
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}">
-                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <div wire:ignore>
+                                <select
+                                    id="drivers-select"
+                                    multiple
+                                    class="select2-users w-full"
+                                >
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}"
+                                            @if(in_array($user->id, $drivers ?? [])) selected @endif
+                                        >
+                                            {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                             @error('drivers.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                         </div>
 
@@ -190,17 +194,21 @@
                                 <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest">Kondakta (Conductors)</h4>
                                 <span class="text-[10px] text-slate-400 font-medium">Search & select users</span>
                             </div>
-                            <select
-                                wire:model="conductors"
-                                multiple
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm text-slate-900"
-                            >
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}">
-                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <div wire:ignore>
+                                <select
+                                    id="conductors-select"
+                                    multiple
+                                    class="select2-users w-full"
+                                >
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}"
+                                            @if(in_array($user->id, $conductors ?? [])) selected @endif
+                                        >
+                                            {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                             @error('conductors.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                         </div>
 
@@ -210,17 +218,21 @@
                                 <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest">Mhudumu (Attendants)</h4>
                                 <span class="text-[10px] text-slate-400 font-medium">Search & select users</span>
                             </div>
-                            <select
-                                wire:model="attendants"
-                                multiple
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm text-slate-900"
-                            >
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}">
-                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <div wire:ignore>
+                                <select
+                                    id="attendants-select"
+                                    multiple
+                                    class="select2-users w-full"
+                                >
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}"
+                                            @if(in_array($user->id, $attendants ?? [])) selected @endif
+                                        >
+                                            {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                             @error('attendants.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                         </div>
                     </div>
@@ -245,4 +257,53 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
     </style>
+    <script>
+        document.addEventListener('livewire:navigated', function () {
+            initBusSelect2();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initBusSelect2();
+        });
+
+        document.addEventListener('open-bus-modal', function () {
+            setTimeout(initBusSelect2, 50);
+        });
+
+        function initBusSelect2() {
+            if (typeof $ === 'undefined' || !$.fn.select2) {
+                return;
+            }
+
+            ['#drivers-select', '#conductors-select', '#attendants-select'].forEach(function (selector) {
+                const el = $(selector);
+                if (!el.length) return;
+
+                if (el.hasClass('select2-hidden-accessible')) {
+                    el.select2('destroy');
+                }
+
+                el.select2({
+                    width: '100%',
+                    placeholder: 'Search & select users',
+                    allowClear: true,
+                });
+            });
+
+            $('#drivers-select').on('change', function () {
+                const values = $(this).val() || [];
+                Livewire.find(@this.__instance.id).set('drivers', values);
+            });
+
+            $('#conductors-select').on('change', function () {
+                const values = $(this).val() || [];
+                Livewire.find(@this.__instance.id).set('conductors', values);
+            });
+
+            $('#attendants-select').on('change', function () {
+                const values = $(this).val() || [];
+                Livewire.find(@this.__instance.id).set('attendants', values);
+            });
+        }
+    </script>
 </div>
