@@ -1,13 +1,132 @@
-<div class="space-y-6" x-data="{ showModal: false }" @open-bus-modal.window="showModal = true" @bus-saved.window="showModal = false">
+<div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-2xl font-bold text-slate-900 font-inter">Manage Fleet</h2>
             <p class="text-sm text-slate-500">Configure buses, routes, and assigned crew members.</p>
         </div>
-        <button @click="showModal = true; $wire.cancelEdit()" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
+        <button wire:click="cancelEdit" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bus"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M8 15h.01"/><path d="M16 15h.01"/><path d="M6 19v2"/><path d="M18 19v2"/></svg>
-            Add New Bus
+            {{ $editingBusId ? 'Cancel Edit' : 'Add New Bus' }}
         </button>
+    </div>
+
+    <!-- Inline Create/Edit Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+            <div>
+                <h3 class="text-sm font-bold text-slate-900">{{ $editingBusId ? 'Revise Fleet Asset' : 'Register New Asset' }}</h3>
+                <p class="text-[11px] text-slate-500 font-medium">Asset &amp; crew configuration.</p>
+            </div>
+            @if (session()->has('message'))
+                <span class="text-[11px] font-semibold text-emerald-600">{{ session('message') }}</span>
+            @endif
+        </div>
+        <div class="p-6 border-b border-slate-100">
+            <form wire:submit.prevent="saveBus" class="space-y-6">
+                <!-- Core Asset Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-semibold text-slate-700 px-0.5">Bus Number (Plate)</label>
+                        <input wire:model="plate_number" type="text" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900" placeholder="e.g. T 123 ABC">
+                        @error('plate_number') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-semibold text-slate-700 px-0.5">Assigned Route</label>
+                        <select wire:model="route_id" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900">
+                            <option value="">--- Not Assigned ---</option>
+                            @foreach($routes as $rt)
+                                <option value="{{ $rt->id }}">{{ $rt->from }} → {{ $rt->to }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Dynamic Staff Sections (assign existing users to this bus) -->
+                <div class="space-y-4">
+                    <!-- Drivers -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between px-0.5">
+                            <h4 class="text-xs font-bold text-slate-900 uppercase tracking-widest">Dereva (Drivers)</h4>
+                            <span class="text-[10px] text-slate-400 font-medium">Search &amp; select users</span>
+                        </div>
+                        <div wire:ignore>
+                            <select
+                                id="drivers-select"
+                                multiple
+                                class="select2-users w-full"
+                            >
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}"
+                                        @if(in_array($user->id, $drivers ?? [])) selected @endif
+                                    >
+                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @error('drivers.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Conductors -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between px-0.5">
+                            <h4 class="text-xs font-bold text-slate-900 uppercase tracking-widest">Kondakta (Conductors)</h4>
+                            <span class="text-[10px] text-slate-400 font-medium">Search &amp; select users</span>
+                        </div>
+                        <div wire:ignore>
+                            <select
+                                id="conductors-select"
+                                multiple
+                                class="select2-users w-full"
+                            >
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}"
+                                        @if(in_array($user->id, $conductors ?? [])) selected @endif
+                                    >
+                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @error('conductors.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Attendants -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between px-0.5">
+                            <h4 class="text-xs font-bold text-slate-900 uppercase tracking-widest">Mhudumu (Attendants)</h4>
+                            <span class="text-[10px] text-slate-400 font-medium">Search &amp; select users</span>
+                        </div>
+                        <div wire:ignore>
+                            <select
+                                id="attendants-select"
+                                multiple
+                                class="select2-users w-full"
+                            >
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}"
+                                        @if(in_array($user->id, $attendants ?? [])) selected @endif
+                                    >
+                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @error('attendants.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-4 flex gap-3">
+                    <button type="button" wire:click="cancelEdit" class="flex-1 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl text-xs font-bold transition-all border border-slate-200">
+                        Discard
+                    </button>
+                    <button type="submit" class="flex-[2] px-6 py-3 bg-slate-900 hover:bg-slate-850 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20">
+                        {{ $editingBusId ? 'Commit Changes' : 'Finalize Registration' }}
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- DataTable Inspired Container -->
@@ -112,142 +231,6 @@
         <!-- Pagination -->
         <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100">
             {{ $buses->links() }}
-        </div>
-    </div>
-
-    <!-- Create/Edit Modal -->
-    <div x-show="showModal" 
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
-         style="display: none;"
-         x-transition>
-        
-        <div class="bg-white w-full max-w-xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[70vh]">
-            <!-- Header -->
-            <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/30 shrink-0">
-                <div>
-                    <h3 class="text-lg font-black text-slate-900 tracking-tight">{{ $editingBusId ? 'Revise Fleet Asset' : 'Register New Asset' }}</h3>
-                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Asset & Crew Configuration</p>
-                </div>
-                <button @click="showModal = false; $wire.cancelEdit()" class="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-            </div>
-
-            <!-- Scrollable Content -->
-            <div class="p-8 overflow-y-auto custom-scrollbar">
-                @if (session()->has('message'))
-                    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-2xl text-xs font-bold flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                        {{ session('message') }}
-                    </div>
-                @endif
-
-                <form wire:submit.prevent="saveBus" class="space-y-8">
-                    <!-- Core Asset Info -->
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Bus Number (Plate)</label>
-                            <input wire:model="plate_number" type="text" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900" placeholder="e.g. T 123 ABC">
-                            @error('plate_number') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Assigned Route</label>
-                            <select wire:model="route_id" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
-                                <option value="">--- Not Assigned ---</option>
-                                @foreach($routes as $rt)
-                                    <option value="{{ $rt->id }}">{{ $rt->from }} → {{ $rt->to }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-
-                    <!-- Dynamic Staff Sections (assign existing users to this bus) -->
-                    <div class="space-y-6">
-                        <!-- Drivers -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between px-1">
-                                <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest">Dereva (Drivers)</h4>
-                                <span class="text-[10px] text-slate-400 font-medium">Search & select users</span>
-                            </div>
-                            <div wire:ignore>
-                                <select
-                                    id="drivers-select"
-                                    multiple
-                                    class="select2-users w-full"
-                                >
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}"
-                                            @if(in_array($user->id, $drivers ?? [])) selected @endif
-                                        >
-                                            {{ $user->name }} ({{ $user->username ?? $user->email }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @error('drivers.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Conductors -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between px-1">
-                                <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest">Kondakta (Conductors)</h4>
-                                <span class="text-[10px] text-slate-400 font-medium">Search & select users</span>
-                            </div>
-                            <div wire:ignore>
-                                <select
-                                    id="conductors-select"
-                                    multiple
-                                    class="select2-users w-full"
-                                >
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}"
-                                            @if(in_array($user->id, $conductors ?? [])) selected @endif
-                                        >
-                                            {{ $user->name }} ({{ $user->username ?? $user->email }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @error('conductors.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Attendants -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between px-1">
-                                <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest">Mhudumu (Attendants)</h4>
-                                <span class="text-[10px] text-slate-400 font-medium">Search & select users</span>
-                            </div>
-                            <div wire:ignore>
-                                <select
-                                    id="attendants-select"
-                                    multiple
-                                    class="select2-users w-full"
-                                >
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}"
-                                            @if(in_array($user->id, $attendants ?? [])) selected @endif
-                                        >
-                                            {{ $user->name }} ({{ $user->username ?? $user->email }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @error('attendants.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="pt-6 flex gap-4 shrink-0">
-                        <button type="button" @click="showModal = false; $wire.cancelEdit()" class="flex-1 px-6 py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border border-slate-200">
-                            Discard
-                        </button>
-                        <button type="submit" class="flex-[2] px-6 py-4 bg-slate-900 hover:bg-slate-850 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20">
-                            {{ $editingBusId ? 'Commit Changes' : 'Finalize Registration' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 
