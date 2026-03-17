@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Bus;
 use App\Models\BusRoute;
+use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -28,12 +29,12 @@ class BusManagement extends Component
         'plate_number' => 'required|string|max:20',
         'status' => 'required|string|in:active,maintenance,inactive',
         'route_id' => 'nullable|exists:bus_routes,id',
-        'drivers.*.name' => 'required|string|max:255',
-        'drivers.*.phone' => 'required|string|max:20',
-        'conductors.*.name' => 'required|string|max:255',
-        'conductors.*.phone' => 'required|string|max:20',
-        'attendants.*.name' => 'required|string|max:255',
-        'attendants.*.phone' => 'required|string|max:20',
+        'drivers' => 'array',
+        'drivers.*' => 'exists:users,id',
+        'conductors' => 'array',
+        'conductors.*' => 'exists:users,id',
+        'attendants' => 'array',
+        'attendants.*' => 'exists:users,id',
     ];
 
     public function mount()
@@ -44,39 +45,6 @@ class BusManagement extends Component
         $this->drivers = [];
         $this->conductors = [];
         $this->attendants = [];
-    }
-
-    public function addDriver()
-    {
-        $this->drivers[] = ['name' => '', 'phone' => ''];
-    }
-
-    public function removeDriver($index)
-    {
-        unset($this->drivers[$index]);
-        $this->drivers = array_values($this->drivers);
-    }
-
-    public function addConductor()
-    {
-        $this->conductors[] = ['name' => '', 'phone' => ''];
-    }
-
-    public function removeConductor($index)
-    {
-        unset($this->conductors[$index]);
-        $this->conductors = array_values($this->conductors);
-    }
-
-    public function addAttendant()
-    {
-        $this->attendants[] = ['name' => '', 'phone' => ''];
-    }
-
-    public function removeAttendant($index)
-    {
-        unset($this->attendants[$index]);
-        $this->attendants = array_values($this->attendants);
     }
 
     public function updatingSearch()
@@ -140,13 +108,17 @@ class BusManagement extends Component
     public function render()
     {
         return view('livewire.bus-management', [
-            'buses' => Bus::with('route')->where(function($query) {
+            'buses' => Bus::with('route')->where(function ($query) {
                     $query->where('plate_number', 'like', '%' . $this->search . '%')
                         ->orWhere('model', 'like', '%' . $this->search . '%');
                 })
                 ->latest()
                 ->paginate($this->perPage),
-            'routes' => BusRoute::all()
+            'routes' => BusRoute::all(),
+            // Only staff users can be assigned to buses
+            'users' => User::where('role', 'staff')
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 }

@@ -53,9 +53,17 @@ class User extends Authenticatable
 
     public function assignedBus()
     {
-        return \App\Models\Bus::whereJsonContains('drivers', (string)$this->id)
-            ->orWhereJsonContains('conductors', (string)$this->id)
-            ->orWhereJsonContains('attendants', (string)$this->id)
+        $id = $this->id;
+
+        return \App\Models\Bus::where(function ($query) use ($id) {
+                // Support both integer and string stored IDs in JSON columns
+                $query->whereJsonContains('drivers', $id)
+                    ->orWhereJsonContains('drivers', (string) $id)
+                    ->orWhereJsonContains('conductors', $id)
+                    ->orWhereJsonContains('conductors', (string) $id)
+                    ->orWhereJsonContains('attendants', $id)
+                    ->orWhereJsonContains('attendants', (string) $id);
+            })
             ->first();
     }
 }

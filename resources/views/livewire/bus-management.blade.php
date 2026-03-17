@@ -162,90 +162,66 @@
                     </div>
 
 
-                    <!-- Dynamic Staff Sections -->
+                    <!-- Dynamic Staff Sections (assign existing users to this bus) -->
                     <div class="space-y-6">
                         <!-- Drivers -->
-                        <div class="space-y-4">
+                        <div class="space-y-2">
                             <div class="flex items-center justify-between px-1">
                                 <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest">Dereva (Drivers)</h4>
-                                <button type="button" wire:click="addDriver" class="text-[10px] font-black text-blue-600 hover:text-blue-700 transition-all">+ Add Driver</button>
+                                <span class="text-[10px] text-slate-400 font-medium">Search & select users</span>
                             </div>
-                            
-                            <div class="space-y-3">
-                                @foreach($drivers as $index => $driver)
-                                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl relative group">
-                                        <button type="button" wire:click="removeDriver({{ $index }})" class="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                                        </button>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div class="space-y-1">
-                                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Full Name</label>
-                                                <input wire:model="drivers.{{ $index }}.name" type="text" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all" placeholder="Enter name">
-                                            </div>
-                                            <div class="space-y-1">
-                                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Phone Number</label>
-                                                <input wire:model="drivers.{{ $index }}.phone" type="text" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all" placeholder="Enter phone">
-                                            </div>
-                                        </div>
-                                    </div>
+                            <select
+                                wire:model="drivers"
+                                multiple
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm text-slate-900"
+                            >
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">
+                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                    </option>
                                 @endforeach
-                            </div>
+                            </select>
+                            @error('drivers.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Conductors -->
-                        <div class="space-y-4">
+                        <div class="space-y-2">
                             <div class="flex items-center justify-between px-1">
                                 <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest">Kondakta (Conductors)</h4>
-                                <button type="button" wire:click="addConductor" class="text-[10px] font-black text-emerald-600 hover:text-emerald-700 transition-all">+ Add Conductor</button>
+                                <span class="text-[10px] text-slate-400 font-medium">Search & select users</span>
                             </div>
-                            
-                            <div class="space-y-3">
-                                @foreach($conductors as $index => $conductor)
-                                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl relative group">
-                                        <button type="button" wire:click="removeConductor({{ $index }})" class="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                                        </button>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div class="space-y-1">
-                                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Full Name</label>
-                                                <input wire:model="conductors.{{ $index }}.name" type="text" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all" placeholder="Enter name">
-                                            </div>
-                                            <div class="space-y-1">
-                                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Phone Number</label>
-                                                <input wire:model="conductors.{{ $index }}.phone" type="text" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all" placeholder="Enter phone">
-                                            </div>
-                                        </div>
-                                    </div>
+                            <select
+                                wire:model="conductors"
+                                multiple
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm text-slate-900"
+                            >
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">
+                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                    </option>
                                 @endforeach
-                            </div>
+                            </select>
+                            @error('conductors.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Attendants -->
-                        <div class="space-y-4">
+                        <div class="space-y-2">
                             <div class="flex items-center justify-between px-1">
                                 <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest">Mhudumu (Attendants)</h4>
-                                <button type="button" wire:click="addAttendant" class="text-[10px] font-black text-amber-600 hover:text-amber-700 transition-all">+ Add Attendant</button>
+                                <span class="text-[10px] text-slate-400 font-medium">Search & select users</span>
                             </div>
-                            
-                            <div class="space-y-3">
-                                @foreach($attendants as $index => $attendant)
-                                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl relative group">
-                                        <button type="button" wire:click="removeAttendant({{ $index }})" class="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                                        </button>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div class="space-y-1">
-                                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Full Name</label>
-                                                <input wire:model="attendants.{{ $index }}.name" type="text" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all" placeholder="Enter name">
-                                            </div>
-                                            <div class="space-y-1">
-                                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Phone Number</label>
-                                                <input wire:model="attendants.{{ $index }}.phone" type="text" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all" placeholder="Enter phone">
-                                            </div>
-                                        </div>
-                                    </div>
+                            <select
+                                wire:model="attendants"
+                                multiple
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm text-slate-900"
+                            >
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">
+                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                    </option>
                                 @endforeach
-                            </div>
+                            </select>
+                            @error('attendants.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
