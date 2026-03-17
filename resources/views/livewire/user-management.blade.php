@@ -152,32 +152,32 @@
 
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">Full Name</label>
-                    <input wire:model="name" type="text" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="e.g. Michael Angelo">
+                    <input wire:model="name" type="text" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400" placeholder="e.g. Michael Angelo">
                     @error('name') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-3">
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">Username</label>
-                        <input wire:model="username" type="text" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="mike_2024">
+                        <input wire:model="username" type="text" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400" placeholder="mike_2024">
                         @error('username') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">Phone</label>
-                        <input wire:model="phone" type="text" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="+255 700...">
+                        <input wire:model="phone" type="text" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400" placeholder="+255 700...">
                         @error('phone') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">Email Address</label>
-                    <input wire:model="email" type="email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="mike@company.com">
+                    <input wire:model="email" type="email" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400" placeholder="mike@company.com">
                     @error('email') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">User Role</label>
-                    <select wire:model="role" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                    <select wire:model="role" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900">
                         <option value="staff">Staff (Regular User)</option>
                         <option value="admin">Administrator (Full Access)</option>
                     </select>
@@ -186,7 +186,7 @@
 
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">Password {{ $editingUserId ? '(Leave blank to keep current)' : '' }}</label>
-                    <input wire:model="password" type="password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="••••••••">
+                    <input wire:model="password" type="password" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400" placeholder="••••••••">
                     @error('password') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                 </div>
 
