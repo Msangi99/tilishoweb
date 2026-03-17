@@ -123,6 +123,30 @@ class ApiParcelController extends Controller
     }
 
     /**
+     * View parcel details by tracking number without changing its status.
+     */
+    public function viewParcel($trackingNumber)
+    {
+        $parcel = Parcel::where('tracking_number', $trackingNumber)
+            ->with(['bus', 'scannedBy'])
+            ->first();
+
+        if (! $parcel) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Parcel haijapatikana',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'parcel' => $parcel,
+            ],
+        ]);
+    }
+
+    /**
      * Get all buses for selection (regardless of status).
      */
     public function getBuses()

@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Parcel routes
     Route::get('/parcels/my', [ApiParcelController::class, 'myParcels']);
+    Route::get('/parcels/view/{tracking_number}', [ApiParcelController::class, 'viewParcel']);
     Route::post('/parcels', [ApiParcelController::class, 'store']);
     Route::post('/parcels/scan', [ApiParcelController::class, 'scanParcel']);
     Route::get('/buses', [ApiParcelController::class, 'getBuses']);
