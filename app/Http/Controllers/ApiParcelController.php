@@ -115,13 +115,15 @@ class ApiParcelController extends Controller
     }
 
     /**
-     * Assign transporter using current authenticated staff and their assigned bus.
+     * Assign transporter using selected bus worker on the staff's assigned bus.
      */
     public function assignTransporter(Request $request)
     {
         $user = $request->user();
         $validated = $request->validate([
             'tracking_number' => 'required|string|exists:parcels,tracking_number',
+            'worker_name' => 'required|string|max:255',
+            'worker_role' => 'nullable|string|max:50',
         ]);
 
         $parcel = Parcel::where('tracking_number', $validated['tracking_number'])->first();
@@ -136,9 +138,14 @@ class ApiParcelController extends Controller
 
         $routeName = $bus->route ? $bus->route->from.' → '.$bus->route->to : null;
 
+        $displayName = $validated['worker_name'];
+        if (! empty($validated['worker_role'])) {
+            $displayName = strtoupper($validated['worker_role']).': '.$displayName;
+        }
+
         $parcel->update([
             'transported_by_id' => $user->id,
-            'transported_by_name' => $user->name,
+            'transported_by_name' => $displayName,
             'transported_bus_id' => $bus->id,
             'transported_route' => $routeName,
             'transported_at' => now(),
