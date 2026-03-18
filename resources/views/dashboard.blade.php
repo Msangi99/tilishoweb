@@ -139,114 +139,273 @@
                     <livewire:parcel-scanner />
                 @else
                     @if(Auth::user()->role == 'admin')
-                    <!-- Stats Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
-                        <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-truck"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-2.235-2.767A.5.5 0 0 0 19.14 10H14"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+                    <!-- Admin Dashboard (powered by API stats) -->
+                    <div 
+                        x-data="dashboardStats()" 
+                        x-init="loadStats()"
+                        class="space-y-10"
+                    >
+                        <!-- Summary cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <!-- Total parcels -->
+                            <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                                    </div>
+                                    <span class="text-[11px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">Total</span>
                                 </div>
-                                <span class="text-[11px] font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">+12%</span>
+                                <h3 class="text-sm font-bold text-slate-500 mb-1">Total Parcels</h3>
+                                <p class="text-3xl font-black text-slate-900" x-text="stats?.totals?.parcels ?? '—'">—</p>
                             </div>
-                            <h3 class="text-sm font-bold text-slate-500 mb-1">Today's Parcels</h3>
-                            <p class="text-3xl font-black text-slate-900">14</p>
+
+                            <!-- Today -->
+                            <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                                    </div>
+                                    <span class="text-[11px] font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">Today</span>
+                                </div>
+                                <h3 class="text-sm font-bold text-slate-500 mb-1">Today's Parcels</h3>
+                                <p class="text-3xl font-black text-slate-900" x-text="stats?.today?.count ?? '—'">—</p>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Revenue: 
+                                    <span class="font-semibold" x-text="formatCurrency(stats?.today?.amount)">TZS 0</span>
+                                </p>
+                            </div>
+
+                            <!-- This week -->
+                            <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+                                    </div>
+                                    <span class="text-[11px] font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded-lg">This Week</span>
+                                </div>
+                                <h3 class="text-sm font-bold text-slate-500 mb-1">Week Parcels</h3>
+                                <p class="text-3xl font-black text-slate-900" x-text="stats?.week?.count ?? '—'">—</p>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Revenue: 
+                                    <span class="font-semibold" x-text="formatCurrency(stats?.week?.amount)">TZS 0</span>
+                                </p>
+                            </div>
+
+                            <!-- This month / year toggle -->
+                            <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 bg-orange-50 text-orange-600 rounded-xl">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up"><path d="M3 17 9 11 13 15 21 7"/><path d="M14 7h7v7"/></svg>
+                                    </div>
+                                    <div class="flex gap-1 rounded-full bg-slate-100 p-1 text-[10px] font-bold">
+                                        <button 
+                                            type="button" 
+                                            @click="range = 'month'"
+                                            :class="range === 'month' ? 'bg-white text-slate-900 shadow-sm px-2 py-0.5 rounded-full' : 'px-2 py-0.5 text-slate-500'"
+                                        >
+                                            Month
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            @click="range = 'year'"
+                                            :class="range === 'year' ? 'bg-white text-slate-900 shadow-sm px-2 py-0.5 rounded-full' : 'px-2 py-0.5 text-slate-500'"
+                                        >
+                                            Year
+                                        </button>
+                                    </div>
+                                </div>
+                                <template x-if="range === 'month'">
+                                    <div>
+                                        <h3 class="text-sm font-bold text-slate-500 mb-1">This Month Parcels</h3>
+                                        <p class="text-3xl font-black text-slate-900" x-text="stats?.month?.count ?? '—'">—</p>
+                                        <p class="text-xs text-slate-500 mt-1">
+                                            Revenue: 
+                                            <span class="font-semibold" x-text="formatCurrency(stats?.month?.amount)">TZS 0</span>
+                                        </p>
+                                    </div>
+                                </template>
+                                <template x-if="range === 'year'">
+                                    <div>
+                                        <h3 class="text-sm font-bold text-slate-500 mb-1">This Year Parcels</h3>
+                                        <p class="text-3xl font-black text-slate-900" x-text="stats?.year?.count ?? '—'">—</p>
+                                        <p class="text-xs text-slate-500 mt-1">
+                                            Revenue: 
+                                            <span class="font-semibold" x-text="formatCurrency(stats?.year?.amount)">TZS 0</span>
+                                        </p>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
 
-                        <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="p-3 bg-purple-50 text-purple-600 rounded-xl">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <!-- Charts + Staff + Recent activity -->
+                        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+                            <!-- Chart -->
+                            <div class="xl:col-span-2 bg-white rounded-3xl border shadow-sm p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h2 class="text-sm font-bold text-slate-900">Parcels (last 7 days)</h2>
                                 </div>
-                                <span class="text-[11px] font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">+8%</span>
+                                <template x-if="stats">
+                                    <div class="h-56 flex items-end gap-2">
+                                        <template x-for="(label, idx) in stats.chart.labels" :key="idx">
+                                            <div class="flex-1 flex flex-col items-center justify-end group">
+                                                <div class="w-full bg-blue-100 rounded-t-xl overflow-hidden relative">
+                                                    <div 
+                                                        class="w-full bg-blue-500 rounded-t-xl transition-all duration-500"
+                                                        :style="`height: ${barHeight(stats.chart.counts[idx])}%;`"
+                                                    ></div>
+                                                </div>
+                                                <span class="mt-2 text-[10px] font-bold text-slate-500 group-hover:text-slate-900" x-text="label"></span>
+                                                <span class="text-[10px] text-slate-400" x-text="stats.chart.counts[idx]"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                                <template x-if="!stats">
+                                    <div class="h-56 flex items-center justify-center text-slate-400 text-sm">
+                                        Loading chart...
+                                    </div>
+                                </template>
                             </div>
-                            <h3 class="text-sm font-bold text-slate-500 mb-1">New Customers</h3>
-                            <p class="text-3xl font-black text-slate-900">52</p>
+
+                            <!-- Staff summary -->
+                            <div class="bg-white rounded-3xl border shadow-sm p-6 space-y-4">
+                                <h2 class="text-sm font-bold text-slate-900 mb-2">Staff Overview</h2>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs text-slate-500">Total Staff</p>
+                                        <p class="text-xl font-black text-slate-900" x-text="stats?.staff?.total_staff ?? '—'">—</p>
+                                    </div>
+                                    <div class="p-3 rounded-2xl bg-slate-50 text-slate-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                                    <div>
+                                        <p class="text-xs text-slate-500">Admins</p>
+                                        <p class="text-base font-bold text-slate-900" x-text="stats?.staff?.total_admins ?? '—'">—</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-slate-500">Staff</p>
+                                        <p class="text-base font-bold text-slate-900" x-text="(stats?.staff?.total_staff ?? 0) - (stats?.staff?.total_admins ?? 0)"></p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-banknote"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-                                </div>
-                                <span class="text-[11px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">This Week</span>
+                        <!-- Recent activity table -->
+                        <div class="bg-white rounded-3xl border shadow-sm overflow-hidden">
+                            <div class="p-6 border-b flex items-center justify-between">
+                                <h2 class="text-sm font-bold text-slate-900">Recent Parcels Activity</h2>
                             </div>
-                            <h3 class="text-sm font-bold text-slate-500 mb-1">Revenue (TZS)</h3>
-                            <p class="text-3xl font-black text-slate-900">1.8M</p>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-left text-sm">
+                                    <thead class="bg-slate-50 border-b">
+                                        <tr>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Tracking</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">From / To</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Amount</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Status</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Created</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-if="stats && stats.recent_parcels.length">
+                                            <template x-for="item in stats.recent_parcels" :key="item.id">
+                                                <tr class="border-b last:border-0 hover:bg-slate-50/60">
+                                                    <td class="px-4 py-2 font-mono text-xs text-slate-800" x-text="item.tracking_number"></td>
+                                                    <td class="px-4 py-2 text-xs text-slate-700">
+                                                        <div class="font-semibold" x-text="item.sender_name + ' → ' + item.receiver_name"></div>
+                                                        <div class="text-[11px] text-slate-500" x-text="item.origin + ' → ' + item.destination"></div>
+                                                    </td>
+                                                    <td class="px-4 py-2 text-xs font-semibold text-emerald-700" x-text="formatCurrency(item.amount)"></td>
+                                                    <td class="px-4 py-2">
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest"
+                                                            :class="statusClass(item.status)">
+                                                            <span x-text="item.status"></span>
+                                                        </span>
+                                                    </td>
+                                                    <td class="px-4 py-2 text-[11px] text-slate-500" x-text="item.created_at"></td>
+                                                </tr>
+                                            </template>
+                                        </template>
+                                        <template x-if="!stats || !stats.recent_parcels.length">
+                                            <tr>
+                                                <td colspan="5" class="px-4 py-10 text-center text-xs text-slate-400">
+                                                    No recent parcels yet.
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
-                        <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="p-3 bg-orange-50 text-orange-600 rounded-xl">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-timer"><path d="M10 2h4"/><path d="M12 14v-4"/><path d="M4 13a8 8 0 0 1 8-7 8 8 0 1 1-5.3 14L4 17.6"/><path d="M9 17H4v5"/></svg>
+                        <template x-if="loading">
+                            <div class="fixed inset-0 z-20 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+                                <div class="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl border shadow-sm">
+                                    <div class="w-4 h-4 border-2 border-slate-300 border-t-blue-600 rounded-full animate-spin"></div>
+                                    <span class="text-xs font-medium text-slate-600">Loading dashboard...</span>
                                 </div>
-                                <span class="text-[11px] font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-lg">Tasks</span>
                             </div>
-                            <h3 class="text-sm font-bold text-slate-500 mb-1">In Transit</h3>
-                            <p class="text-3xl font-black text-slate-900">03</p>
-                        </div>
+                        </template>
+
                     </div>
-
-                    <!-- Content Area -->
-                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                        <!-- Recent Activity -->
-                        <div class="xl:col-span-2 bg-white rounded-3xl border shadow-sm overflow-hidden flex flex-col">
-                            <div class="p-8 border-b flex items-center justify-between">
-                                <h2 class="text-lg font-bold text-slate-900">Recent Shipments</h2>
-                                <button class="text-xs font-bold text-blue-600 hover:text-blue-700">View All</button>
-                            </div>
-                            <div class="p-12 text-center flex-1 flex flex-col items-center justify-center space-y-4">
-                                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.29 7 12 12l8.71-5"/><path d="M12 22V12"/></svg>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-slate-800">No shipments found yet</h4>
-                                    <p class="text-xs text-slate-500 mt-1">New shipments will appear here automatically when registered.</p>
-                                </div>
-                                <button class="px-6 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all">Register New Parcel</button>
-                            </div>
-                        </div>
-
-                        <!-- Important Information -->
-                        <div class="bg-white rounded-3xl border shadow-sm p-8">
-                            <h2 class="text-lg font-bold text-slate-900 mb-6">Important Notices</h2>
-                            <div class="space-y-6">
-                                <div class="flex gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-orange-100 flex-shrink-0 flex items-center justify-center text-orange-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-800 line-clamp-1">Tarakea route closed</p>
-                                        <p class="text-[10px] text-slate-500 mt-0.5">Heavy rain causing 4-hour delay.</p>
-                                        <span class="text-[9px] text-slate-400 mt-2 block font-medium">5 minutes ago</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-100 flex-shrink-0 flex items-center justify-center text-blue-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-800 line-clamp-1">Monthly report ready</p>
-                                        <p class="text-[10px] text-slate-500 mt-0.5">Available for download and review.</p>
-                                        <span class="text-[9px] text-slate-400 mt-2 block font-medium">2 hours ago</span>
-                                    </div>
-                                </div>
-
-                                <div class="flex gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-green-100 flex-shrink-0 flex items-center justify-center text-green-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-800 line-clamp-1">10 new users registered</p>
-                                        <p class="text-[10px] text-slate-500 mt-0.5">From Arusha and Moshi regions.</p>
-                                        <span class="text-[9px] text-slate-400 mt-2 block font-medium">4 hours ago</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button class="w-full mt-8 py-3 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-xl text-xs font-bold border border-dashed border-slate-200 transition-all">View All Activity Logs</button>
-                        </div>
-                    </div>
+                    <script>
+                        function dashboardStats() {
+                            return {
+                                stats: null,
+                                loading: false,
+                                range: 'month',
+                                async loadStats() {
+                                    this.loading = true;
+                                    try {
+                                        const response = await fetch('{{ url('/api/dashboard') }}', {
+                                            headers: {
+                                                'Accept': 'application/json',
+                                            },
+                                            credentials: 'same-origin',
+                                        });
+                                        const data = await response.json();
+                                        if (data.status === 'success') {
+                                            this.stats = data.data;
+                                        }
+                                    } catch (e) {
+                                        console.error('Failed to load dashboard stats', e);
+                                    } finally {
+                                        this.loading = false;
+                                    }
+                                },
+                                formatCurrency(value) {
+                                    if (value === null || value === undefined) return 'TZS 0';
+                                    const num = Number(value) || 0;
+                                    return 'TZS ' + num.toLocaleString('en-TZ', { maximumFractionDigits: 0 });
+                                },
+                                barHeight(count) {
+                                    const max = this.stats && this.stats.chart && this.stats.chart.counts.length
+                                        ? Math.max(...this.stats.chart.counts)
+                                        : 0;
+                                    if (!max) return 5;
+                                    return 10 + (count / max) * 80;
+                                },
+                                statusClass(status) {
+                                    const value = (status || '').toLowerCase();
+                                    switch (value) {
+                                        case 'pending':
+                                            return 'bg-amber-50 text-amber-700 border border-amber-100';
+                                        case 'in-transit':
+                                        case 'packed':
+                                            return 'bg-blue-50 text-blue-700 border border-blue-100';
+                                        case 'arrived':
+                                        case 'delivered':
+                                        case 'received':
+                                            return 'bg-emerald-50 text-emerald-700 border border-emerald-100';
+                                        default:
+                                            return 'bg-slate-50 text-slate-600 border border-slate-100';
+                                    }
+                                },
+                            };
+                        }
+                    </script>
                     @else
                         <livewire:user-dashboard />
                     @endif
