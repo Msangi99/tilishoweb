@@ -1,22 +1,15 @@
 <x-layouts.admin>
-    <div 
-        class="flex min-h-screen bg-slate-50"
-        x-data="{ currentView: '{{ request()->query('view', 'dashboard') }}', sidebarOpen: window.innerWidth >= 768 }"
-        x-init="sidebarOpen = window.innerWidth >= 768"
-        @resize.window="sidebarOpen = window.innerWidth >= 768 ? true : sidebarOpen"
-    >
+    <div class="flex min-h-screen bg-slate-50">
         <!-- Mobile sidebar backdrop -->
         <div 
-            x-show="sidebarOpen"
-            x-transition.opacity
-            class="fixed inset-0 z-20 bg-slate-900/60 md:hidden"
-            @click="sidebarOpen = false"
+            id="sidebarBackdrop"
+            class="fixed inset-0 z-20 bg-slate-900/60 md:hidden hidden"
         ></div>
 
         <!-- Sidebar -->
         <aside 
-            class="fixed inset-y-0 left-0 z-30 w-64 md:w-64 bg-[#1a2234] text-slate-300 flex-shrink-0 flex flex-col shadow-xl transform transition-transform duration-200 ease-in-out"
-            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+            id="sidebar"
+            class="fixed inset-y-0 left-0 z-30 w-64 md:w-64 bg-[#1a2234] text-slate-300 flex-shrink-0 flex flex-col shadow-xl transform transition-transform duration-200 ease-in-out -translate-x-full md:translate-x-0"
         >
             <!-- Sidebar Header -->
             <div class="p-8 flex flex-col items-center gap-4">
@@ -74,8 +67,8 @@
                 <div class="flex items-center gap-3">
                     <!-- Mobile menu button -->
                     <button 
+                        id="sidebarToggle"
                         class="inline-flex items-center justify-center p-2 rounded-lg text-slate-600 hover:bg-slate-100 md:hidden"
-                        @click="sidebarOpen = true"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="3" y1="12" x2="21" y2="12" />
@@ -276,4 +269,49 @@
             </div>
         </main>
     </div>
+
+    <style>
+        /* Ensure sidebar is visible on desktop and can slide on mobile */
+        @media (min-width: 768px) {
+            #sidebar {
+                transform: translateX(0) !important;
+            }
+            #sidebarBackdrop {
+                display: none !important;
+            }
+        }
+        .sidebar-open-mobile {
+            transform: translateX(0) !important;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+            const toggleBtn = document.getElementById('sidebarToggle');
+
+            if (!sidebar || !sidebarBackdrop || !toggleBtn) return;
+
+            const openSidebarMobile = () => {
+                sidebar.classList.add('sidebar-open-mobile');
+                sidebarBackdrop.classList.remove('hidden');
+            };
+
+            const closeSidebarMobile = () => {
+                sidebar.classList.remove('sidebar-open-mobile');
+                sidebarBackdrop.classList.add('hidden');
+            };
+
+            toggleBtn.addEventListener('click', function () {
+                if (sidebar.classList.contains('sidebar-open-mobile')) {
+                    closeSidebarMobile();
+                } else {
+                    openSidebarMobile();
+                }
+            });
+
+            sidebarBackdrop.addEventListener('click', closeSidebarMobile);
+        });
+    </script>
 </x-layouts.admin>
