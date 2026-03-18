@@ -586,6 +586,51 @@
                                 --------------------------------------------
                             </div>
 
+                            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                @if($viewingParcel->createdBy)
+                                    <div class="space-y-2">
+                                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                            Created By
+                                        </p>
+                                        <p class="text-sm font-semibold text-slate-900">
+                                            {{ $viewingParcel->createdBy?->name }}
+                                        </p>
+                                        @if($viewingParcel->createdBy?->phone)
+                                            <p class="text-xs font-mono text-slate-600">
+                                                {{ $viewingParcel->createdBy?->phone }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                @php
+                                    $transportedBus = $viewingParcel->transportedBus;
+                                    $busPlate = $transportedBus?->plate_number;
+                                    $busRoute = $viewingParcel->transported_route ?: $transportedBus?->route_name;
+                                @endphp
+                                @if($busPlate || $busRoute)
+                                    <div class="space-y-2">
+                                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                            Transport Bus
+                                        </p>
+                                        @if($busPlate)
+                                            <p class="text-sm font-semibold text-slate-900">
+                                                Plate: {{ $busPlate }}
+                                            </p>
+                                        @endif
+                                        @if($busRoute)
+                                            <p class="text-xs text-slate-600">
+                                                Route: {{ $busRoute }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="mt-6 text-center text-[11px] text-slate-400 tracking-[0.3em] font-black">
+                                --------------------------------------------
+                            </div>
+
                             <div class="mt-8 flex items-center justify-between">
                                 <button @click="showDetails = false; $wire.closeDetails()"
                                     class="px-8 py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all">
