@@ -1,4 +1,4 @@
-<div class="w-full max-w-2xl mx-auto p-6 bg-card rounded-xl shadow-2xl border">
+<div class="w-full max-w-xl mx-auto p-6 bg-card rounded-xl shadow-2xl border">
     <div class="space-y-2 mb-6 text-center">
         <h2 class="text-3xl font-bold tracking-tight">Tuma Mzigo Wako</h2>
         <p class="text-muted-foreground">Jaza maelezo hapa chini ili kuanza mchakato wa kutuma mzigo.</p>

@@ -61,15 +61,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-1.5">
                             <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Travel Date</label>
-                            <input wire:model="travel_date" type="date" class="w-full px-5 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                            <p class="w-full px-5 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900">
+                                {{ now()->format('Y-m-d') }}
+                            </p>
                         </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Start Time (Departure)</label>
-                            <input wire:model="start_travel_time" type="time" class="w-full px-5 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">End Time (Arrival)</label>
-                            <input wire:model="end_travel_time" type="time" class="w-full px-5 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                        <div class="space-y-1.5 md:col-span-2">
+                            <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Times</label>
+                            <p class="w-full px-5 py-3 bg-white border border-slate-200 rounded-2xl text-sm text-slate-600">
+                                Departure and arrival times will be recorded automatically.
+                            </p>
                         </div>
                     </div>
 

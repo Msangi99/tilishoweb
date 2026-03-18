@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Parcel;
+use App\Models\Bus;
 use Livewire\WithPagination;
 
 class ParcelManagement extends Component
@@ -44,11 +45,14 @@ class ParcelManagement extends Component
     public $destination;
     public $amount;
     public $description;
+    public $bus_id;
+    public $travel_date;
 
     public function mount()
     {
         $this->action = request()->query('action');
         $this->parcelId = request()->query('id');
+        $this->travel_date = now()->format('Y-m-d');
         if ($this->action === 'edit' && $this->parcelId) {
             $this->editParcel((int) $this->parcelId);
         }
@@ -65,7 +69,8 @@ class ParcelManagement extends Component
             'destination' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'status' => 'required|in:pending,in-transit,delivered,cancelled',
+            'bus_id' => 'nullable|exists:buses,id',
+            'travel_date' => 'required|date',
         ];
     }
 
@@ -119,11 +124,14 @@ class ParcelManagement extends Component
         $this->amount = $parcel->amount;
         $this->description = $parcel->description;
         $this->status = $parcel->status;
+        $this->bus_id = $parcel->bus_id;
+        $this->travel_date = optional($parcel->travel_date)->format('Y-m-d') ?? now()->format('Y-m-d');
     }
 
     public function cancelEdit()
     {
-        $this->reset(['editingParcelId', 'sender_name', 'sender_phone', 'receiver_name', 'receiver_phone', 'origin', 'destination', 'amount', 'description', 'status']);
+        $this->reset(['editingParcelId', 'sender_name', 'sender_phone', 'receiver_name', 'receiver_phone', 'origin', 'destination', 'amount', 'description', 'status', 'bus_id', 'travel_date']);
+        $this->travel_date = now()->format('Y-m-d');
         $this->resetErrorBag();
     }
 
@@ -142,7 +150,8 @@ class ParcelManagement extends Component
                 'destination' => $this->destination,
                 'amount' => $this->amount,
                 'description' => $this->description,
-                'status' => $this->status,
+                'bus_id' => $this->bus_id,
+                'travel_date' => $this->travel_date,
             ]);
             session()->flash('message', 'Parcel updated successfully.');
         } else {
@@ -155,7 +164,9 @@ class ParcelManagement extends Component
                 'destination' => $this->destination,
                 'amount' => $this->amount,
                 'description' => $this->description,
-                'status' => $this->status,
+                'status' => 'pending',
+                'bus_id' => $this->bus_id,
+                'travel_date' => $this->travel_date,
                 'created_by' => auth()->id(),
             ]);
             session()->flash('message', 'Parcel registered successfully.');
@@ -183,7 +194,8 @@ class ParcelManagement extends Component
                 })
                 ->latest()
                 ->paginate($this->perPage),
-            'stations' => $this->getStations()
+            'stations' => $this->getStations(),
+            'buses' => Bus::orderBy('plate_number')->get(),
         ]);
     }
 }

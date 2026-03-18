@@ -1,15 +1,9 @@
 <x-layouts.admin>
     <div class="flex min-h-screen bg-slate-50">
-        <!-- Mobile sidebar backdrop -->
-        <div 
-            id="sidebarBackdrop"
-            class="fixed inset-0 z-20 bg-slate-900/60 md:hidden hidden"
-        ></div>
-
         <!-- Sidebar -->
         <aside 
             id="sidebar"
-            class="fixed inset-y-0 left-0 z-30 w-64 md:w-64 bg-[#1a2234] text-slate-300 flex-shrink-0 flex flex-col shadow-xl transform transition-transform duration-200 ease-in-out -translate-x-full md:translate-x-0"
+            class="fixed inset-y-0 left-0 z-30 w-64 bg-[#1a2234] text-slate-300 flex-shrink-0 flex flex-col shadow-xl"
         >
             <!-- Sidebar Header -->
             <div class="p-8 flex flex-col items-center gap-4">
@@ -61,21 +55,12 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col relative z-10 bg-slate-50 md:ml-64">
+        <main class="flex-1 flex flex-col relative z-10 bg-slate-50 ml-64">
             <!-- Top Header -->
             <header class="h-20 bg-white/80 backdrop-blur-md border-b flex items-center justify-between px-4 md:px-10 sticky top-0 z-10">
                 <div class="flex items-center gap-3">
                     <!-- Mobile menu button -->
-                    <button 
-                        id="sidebarToggle"
-                        class="inline-flex items-center justify-center p-2 rounded-lg text-slate-600 hover:bg-slate-100 md:hidden"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="3" y1="12" x2="21" y2="12" />
-                            <line x1="3" y1="6" x2="21" y2="6" />
-                            <line x1="3" y1="18" x2="21" y2="18" />
-                        </svg>
-                    </button>
+                    <!-- (Optional) mobile menu button removed to avoid JS issues -->
                     <div class="flex flex-col">
                     <h1 class="text-xl font-bold text-slate-900">System Dashboard</h1>
                     <p class="text-[11px] text-slate-500 font-medium">Welcome back to the management portal</p>
@@ -269,49 +254,4 @@
             </div>
         </main>
     </div>
-
-    <style>
-        /* Ensure sidebar is visible on desktop and can slide on mobile */
-        @media (min-width: 768px) {
-            #sidebar {
-                transform: translateX(0) !important;
-            }
-            #sidebarBackdrop {
-                display: none !important;
-            }
-        }
-        .sidebar-open-mobile {
-            transform: translateX(0) !important;
-        }
-    </style>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.getElementById('sidebar');
-            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
-            const toggleBtn = document.getElementById('sidebarToggle');
-
-            if (!sidebar || !sidebarBackdrop || !toggleBtn) return;
-
-            const openSidebarMobile = () => {
-                sidebar.classList.add('sidebar-open-mobile');
-                sidebarBackdrop.classList.remove('hidden');
-            };
-
-            const closeSidebarMobile = () => {
-                sidebar.classList.remove('sidebar-open-mobile');
-                sidebarBackdrop.classList.add('hidden');
-            };
-
-            toggleBtn.addEventListener('click', function () {
-                if (sidebar.classList.contains('sidebar-open-mobile')) {
-                    closeSidebarMobile();
-                } else {
-                    openSidebarMobile();
-                }
-            });
-
-            sidebarBackdrop.addEventListener('click', closeSidebarMobile);
-        });
-    </script>
 </x-layouts.admin>

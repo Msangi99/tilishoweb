@@ -20,7 +20,7 @@
     @if(!$showList)
     <!-- Create/Edit Form (shown first by default) -->
     <div class="w-full flex justify-center mb-6">
-        <div class="w-[80%] max-w-4xl bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
                 <div>
                     <h3 class="text-sm font-bold text-slate-900">{{ $editingBusId ? 'Revise Fleet Asset' : 'Register New Asset' }}</h3>
@@ -30,8 +30,8 @@
                     <span class="text-[11px] font-semibold text-emerald-600">{{ session('message') }}</span>
                 @endif
             </div>
-            <div class="p-6 border-t border-slate-100">
-                <form wire:submit.prevent="saveBus" class="space-y-6">
+            <div class="p-4 md:p-6 border-t border-slate-100">
+                <form wire:submit.prevent="saveBus" class="space-y-4">
                     <!-- Core Asset Info -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-1.5">
@@ -51,7 +51,7 @@
                     </div>
 
                     <!-- Dynamic Staff Sections (assign existing users to this bus) -->
-                    <div class="space-y-4">
+                    <div class="space-y-3 max-h-[260px] overflow-y-auto pr-1 custom-scrollbar">
                         <!-- Drivers -->
                         <div class="space-y-2">
                             <div class="flex items-center justify-between px-0.5">

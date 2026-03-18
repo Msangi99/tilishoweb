@@ -51,23 +51,19 @@ class ParcelScanner extends Component
 
     public function saveScan()
     {
-        $this->validate([
-            'travel_date' => 'required|date',
-            'start_travel_time' => 'required',
-            'end_travel_time' => 'required',
-        ]);
-
         if (!$this->parcel || !$this->bus) {
             $this->error = "Hitilafu imetokea. Tafadhali jaribu tena.";
             return;
         }
 
+        $now = now();
+
         $this->parcel->update([
             'scanned_by' => Auth::id(),
             'bus_id' => $this->bus->id,
-            'travel_date' => $this->travel_date,
-            'start_travel_time' => $this->start_travel_time,
-            'end_travel_time' => $this->end_travel_time,
+            'travel_date' => $now->toDateString(),
+            'start_travel_time' => $now->format('H:i'),
+            'end_travel_time' => null,
             'status' => 'packed', // Initial scanned status
         ]);
 

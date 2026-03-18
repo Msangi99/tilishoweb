@@ -27,8 +27,8 @@
     </div>
 
     <div class="w-full flex justify-center">
-        <div class="w-[80%] max-w-4xl bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-8 pt-8 pb-4 border-b border-slate-100">
+        <div class="w-full max-w-3xl bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 pt-6 pb-4 border-b border-slate-100">
             <h3 class="text-xl font-black text-slate-900 tracking-tight">{{ $editingParcelId ? 'Edit Parcel' : 'Register New Parcel' }}</h3>
             <p class="text-[11px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-2">Enter shipment details below</p>
             @if (session()->has('message'))
@@ -36,9 +36,9 @@
             @endif
         </div>
 
-        <div class="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-        <form wire:submit="saveParcel" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="p-6 space-y-5">
+        <form wire:submit="saveParcel" class="space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-6">
                     <div class="flex items-center gap-2 mb-2">
                         <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
@@ -78,7 +78,7 @@
                     <div class="w-1.5 h-6 bg-slate-900 rounded-full"></div>
                     <h4 class="text-[10px] font-black uppercase text-slate-900 tracking-widest">Shipment Info</h4>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Origin (From)</label>
                         <div wire:ignore>
@@ -104,21 +104,22 @@
                         @error('destination') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Amount (TZS)</label>
                         <input wire:model="amount" type="number" step="0.01" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                         @error('amount') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Status</label>
-                        <select wire:model="status" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                            <option value="pending">Pending</option>
-                            <option value="in-transit">In Transit</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                        @error('status') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Travel Date</label>
+                        <input wire:model="travel_date" type="date" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        @error('travel_date') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Bus Info</label>
+                        <p class="text-sm text-slate-500 px-1">
+                            Bus will be filled automatically when scanned.
+                        </p>
                     </div>
                 </div>
                 <div class="space-y-1.5">
