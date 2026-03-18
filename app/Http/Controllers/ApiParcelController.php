@@ -71,10 +71,11 @@ class ApiParcelController extends Controller
             'destination' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'description' => 'nullable|string|max:1000',
-            'bus_id' => 'required|exists:buses,id',
-            'travel_date' => 'required|date|after_or_equal:today',
-            'start_travel_time' => 'required|date_format:H:i',
-            'end_travel_time' => 'required|date_format:H:i|after:start_travel_time',
+            // Bus and timetable will be filled later when parcel is scanned / assigned
+            'bus_id' => 'nullable|exists:buses,id',
+            'travel_date' => 'nullable|date|after_or_equal:today',
+            'start_travel_time' => 'nullable|date_format:H:i',
+            'end_travel_time' => 'nullable|date_format:H:i|after:start_travel_time',
         ]);
 
         $parcel = Parcel::create([
@@ -86,10 +87,10 @@ class ApiParcelController extends Controller
             'destination' => $validated['destination'],
             'amount' => $validated['amount'],
             'description' => $validated['description'] ?? null,
-            'bus_id' => $validated['bus_id'],
-            'travel_date' => $validated['travel_date'],
-            'start_travel_time' => $validated['start_travel_time'],
-            'end_travel_time' => $validated['end_travel_time'],
+            'bus_id' => $validated['bus_id'] ?? null,
+            'travel_date' => $validated['travel_date'] ?? null,
+            'start_travel_time' => $validated['start_travel_time'] ?? null,
+            'end_travel_time' => $validated['end_travel_time'] ?? null,
             'status' => 'pending',
             'created_by' => $user->id,
         ]);
