@@ -1,8 +1,8 @@
 <div class="space-y-8">
-    <!-- Header Stats for Staff -->
+    <!-- Header Stats for Staff: parcels I created / transported / received -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-        <!-- Today's Stats -->
+        <!-- Parcels I created -->
         <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 group relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
             <div class="flex items-center gap-4 mb-6 relative">
@@ -10,20 +10,20 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
                 </div>
                 <div>
-                    <h3 class="font-black text-slate-400 text-[10px] uppercase tracking-[0.2em]">Today's Activity</h3>
-                    <p class="text-xs font-bold text-slate-500">{{ now()->format('l, d M') }}</p>
+                    <h3 class="font-black text-slate-400 text-[10px] uppercase tracking-[0.2em]">Parcels I Created</h3>
+                    <p class="text-xs font-bold text-slate-500">All time</p>
                 </div>
             </div>
             <div class="space-y-2 relative">
                 <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-slate-900 tracking-tight">{{ $todayCount }}</span>
+                    <span class="text-4xl font-black text-slate-900 tracking-tight">{{ $createdCount }}</span>
                     <span class="text-xs font-bold text-slate-400 capitalize">Parcels</span>
                 </div>
-                <p class="text-sm font-bold text-amber-600">TZS {{ number_format($todayAmount) }}</p>
+                <p class="text-sm font-bold text-amber-600">TZS {{ number_format($createdAmount) }}</p>
             </div>
         </div>
 
-        <!-- Weekly Stats -->
+        <!-- Parcels I transported -->
         <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 group relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
             <div class="flex items-center gap-4 mb-6 relative">
@@ -31,20 +31,20 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </div>
                 <div>
-                    <h3 class="font-black text-slate-400 text-[10px] uppercase tracking-[0.2em]">This Week</h3>
-                    <p class="text-xs font-bold text-slate-500">Summary</p>
+                    <h3 class="font-black text-slate-400 text-[10px] uppercase tracking-[0.2em]">Parcels I Transported</h3>
+                    <p class="text-xs font-bold text-slate-500">Assigned as transporter</p>
                 </div>
             </div>
             <div class="space-y-2 relative">
                 <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-slate-900 tracking-tight">{{ $weekCount }}</span>
-                    <span class="text-xs font-bold text-slate-400">Total</span>
+                    <span class="text-4xl font-black text-slate-900 tracking-tight">{{ $transportedCount }}</span>
+                    <span class="text-xs font-bold text-slate-400">Parcels</span>
                 </div>
-                <p class="text-sm font-bold text-blue-600">TZS {{ number_format($weekAmount) }}</p>
+                <p class="text-sm font-bold text-blue-600">TZS {{ number_format($transportedAmount) }}</p>
             </div>
         </div>
 
-        <!-- Team Stats/Collections -->
+        <!-- Parcels I received -->
         <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 group relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
             <div class="flex items-center gap-4 mb-6 relative">
@@ -52,15 +52,16 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-banknote"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
                 </div>
                 <div>
-                    <h3 class="font-black text-slate-400 text-[10px] uppercase tracking-[0.2em]">Efficiency</h3>
-                    <p class="text-xs font-bold text-slate-500">Live Tracker</p>
+                    <h3 class="font-black text-slate-400 text-[10px] uppercase tracking-[0.2em]">Parcels I Received</h3>
+                    <p class="text-xs font-bold text-slate-500">Confirmed to customers</p>
                 </div>
             </div>
-            <div class="space-y-4 relative">
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-emerald-500 rounded-full w-2/3 animate-pulse"></div>
+            <div class="space-y-2 relative">
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-black text-slate-900 tracking-tight">{{ $receivedCount }}</span>
+                    <span class="text-xs font-bold text-slate-400">Parcels</span>
                 </div>
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Performance optimized</p>
+                <p class="text-sm font-bold text-emerald-600">TZS {{ number_format($receivedAmount) }}</p>
             </div>
         </div>
     </div>
