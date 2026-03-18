@@ -79,7 +79,7 @@ class RouteManagement extends Component
         $this->to = $route->to;
         $this->stations = $route->stations;
 
-        $this->dispatch('open-route-modal');
+        $this->dispatch('init-route-select2');
     }
 
     public function cancelEdit()
@@ -98,6 +98,7 @@ class RouteManagement extends Component
     {
         $this->showList = false;
         $this->cancelEdit();
+        $this->dispatch('init-route-select2');
     }
 
     public function saveRoute()

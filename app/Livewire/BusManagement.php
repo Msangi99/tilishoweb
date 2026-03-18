@@ -69,7 +69,7 @@ class BusManagement extends Component
         $this->conductors = $bus->conductors ?? [];
         $this->attendants = $bus->attendants ?? [];
 
-        $this->dispatch('open-bus-modal');
+        $this->dispatch('init-bus-select2');
     }
 
     public function cancelEdit()
@@ -88,6 +88,7 @@ class BusManagement extends Component
     {
         $this->showList = false;
         $this->cancelEdit();
+        $this->dispatch('init-bus-select2');
     }
 
     public function saveBus()

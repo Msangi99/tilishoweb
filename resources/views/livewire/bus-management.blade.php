@@ -262,7 +262,7 @@
             initBusSelect2();
         });
 
-        document.addEventListener('open-bus-modal', function () {
+        document.addEventListener('init-bus-select2', function () {
             setTimeout(initBusSelect2, 50);
         });
 

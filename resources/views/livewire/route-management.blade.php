@@ -209,4 +209,55 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
     </style>
+    <script>
+        document.addEventListener('livewire:navigated', function () {
+            initRouteSelect2();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initRouteSelect2();
+        });
+
+        document.addEventListener('init-route-select2', function () {
+            setTimeout(initRouteSelect2, 50);
+        });
+
+        function initRouteSelect2() {
+            if (typeof $ === 'undefined' || !$.fn.select2) {
+                return;
+            }
+
+            const fromEl = $('#select-from');
+            const toEl = $('#select-to');
+
+            [fromEl, toEl].forEach(function (el) {
+                if (!el.length) return;
+                if (el.hasClass('select2-hidden-accessible')) {
+                    el.select2('destroy');
+                }
+            });
+
+            if (fromEl.length) {
+                fromEl.select2({
+                    width: '100%',
+                    placeholder: 'Select Origin...',
+                    allowClear: true,
+                }).on('change', function () {
+                    const value = $(this).val() || '';
+                    Livewire.find(@this.__instance.id).set('from', value);
+                });
+            }
+
+            if (toEl.length) {
+                toEl.select2({
+                    width: '100%',
+                    placeholder: 'Select Destination...',
+                    allowClear: true,
+                }).on('change', function () {
+                    const value = $(this).val() || '';
+                    Livewire.find(@this.__instance.id).set('to', value);
+                });
+            }
+        }
+    </script>
 </div>
