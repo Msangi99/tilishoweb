@@ -15,6 +15,10 @@ class UserDashboard extends Component
     public $transportedAmount;
     public $receivedCount;
     public $receivedAmount;
+    public $weekTotalCount;
+    public $weekTotalAmount;
+    public $monthTotalCount;
+    public $monthTotalAmount;
     public $chartData;
 
     public function mount()
@@ -25,6 +29,9 @@ class UserDashboard extends Component
     public function calculateStats()
     {
         $userId = Auth::id();
+
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $startOfMonth = Carbon::now()->startOfMonth();
 
         // Parcels this staff created
         $this->createdCount = Parcel::where('created_by', $userId)->count();
@@ -37,6 +44,40 @@ class UserDashboard extends Component
         // Parcels this staff received
         $this->receivedCount = Parcel::where('received_by_id', $userId)->count();
         $this->receivedAmount = Parcel::where('received_by_id', $userId)->sum('amount');
+
+        // Weekly totals where this staff participated (created, transported or received)
+        $this->weekTotalCount = Parcel::where(function ($q) use ($userId) {
+                $q->where('created_by', $userId)
+                  ->orWhere('transported_by_id', $userId)
+                  ->orWhere('received_by_id', $userId);
+            })
+            ->where('created_at', '>=', $startOfWeek)
+            ->count();
+
+        $this->weekTotalAmount = Parcel::where(function ($q) use ($userId) {
+                $q->where('created_by', $userId)
+                  ->orWhere('transported_by_id', $userId)
+                  ->orWhere('received_by_id', $userId);
+            })
+            ->where('created_at', '>=', $startOfWeek)
+            ->sum('amount');
+
+        // Monthly totals where this staff participated
+        $this->monthTotalCount = Parcel::where(function ($q) use ($userId) {
+                $q->where('created_by', $userId)
+                  ->orWhere('transported_by_id', $userId)
+                  ->orWhere('received_by_id', $userId);
+            })
+            ->where('created_at', '>=', $startOfMonth)
+            ->count();
+
+        $this->monthTotalAmount = Parcel::where(function ($q) use ($userId) {
+                $q->where('created_by', $userId)
+                  ->orWhere('transported_by_id', $userId)
+                  ->orWhere('received_by_id', $userId);
+            })
+            ->where('created_at', '>=', $startOfMonth)
+            ->sum('amount');
 
         // Chart Data (Last 7 days)
         $labels = [];

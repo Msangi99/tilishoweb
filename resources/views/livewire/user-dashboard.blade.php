@@ -66,9 +66,33 @@
         </div>
     </div>
 
+    <!-- Weekly / Monthly Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">This Week</p>
+                <p class="mt-1 text-sm font-semibold text-slate-700">Parcels I participated in</p>
+            </div>
+            <div class="text-right">
+                <p class="text-2xl font-black text-slate-900">{{ $weekTotalCount }}</p>
+                <p class="text-xs font-bold text-emerald-600 mt-1">TZS {{ number_format($weekTotalAmount) }}</p>
+            </div>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">This Month</p>
+                <p class="mt-1 text-sm font-semibold text-slate-700">Parcels I participated in</p>
+            </div>
+            <div class="text-right">
+                <p class="text-2xl font-black text-slate-900">{{ $monthTotalCount }}</p>
+                <p class="text-xs font-bold text-blue-600 mt-1">TZS {{ number_format($monthTotalAmount) }}</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Animated Graph Section -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div class="xl:col-span-2 bg-white rounded-[3rem] border border-slate-200 shadow-sm p-10">
+    <div class="mt-8">
+        <div class="bg-white rounded-[3rem] border border-slate-200 shadow-sm p-10">
             <div class="flex items-center justify-between mb-10">
                 <div>
                     <h2 class="text-2xl font-black text-slate-900 tracking-tight">Shipment Trends</h2>
@@ -84,52 +108,6 @@
             
             <div class="h-[300px] w-full relative" wire:ignore>
                 <canvas id="shipmentChart"></canvas>
-            </div>
-        </div>
-
-        <div class="bg-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden group">
-            <div class="absolute inset-0 bg-blue-600/10 pointer-events-none"></div>
-            <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-all duration-700"></div>
-            
-            <h2 class="text-xl font-black tracking-tight mb-8 relative">Quick Shortcuts</h2>
-            
-            <div class="space-y-4 relative">
-                <button @click="window.location.href='{{ route('dashboard', ['view' => 'scan']) }}'" class="w-full flex items-center justify-between p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-all group">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M7 21v-4a2 2 0 0 1 2-2h10"/><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/></svg>
-                        </div>
-                        <span class="text-sm font-black uppercase tracking-widest">Scan QR Code</span>
-                    </div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/20 group-hover:text-white transition-colors"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                </button>
-
-                <button @click="window.location.href='{{ route('dashboard', ['view' => 'parcels']) }}'" class="w-full flex items-center justify-between p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-all group">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                        </div>
-                        <span class="text-sm font-black uppercase tracking-widest">Register New Parcel</span>
-                    </div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/20 group-hover:text-white transition-colors"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                </button>
-
-                <button class="w-full flex items-center justify-between p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-all group opacity-50 cursor-not-allowed">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        </div>
-                        <span class="text-sm font-black uppercase tracking-widest">Pending Shipments</span>
-                    </div>
-                </button>
-            </div>
-
-            <div class="mt-12 p-6 bg-white/5 rounded-[2rem] border border-white/5 relative">
-                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Branch Status</p>
-                <div class="flex items-center gap-3">
-                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.5)]"></div>
-                    <span class="text-xs font-bold">System Online & Synchronized</span>
-                </div>
             </div>
         </div>
     </div>
