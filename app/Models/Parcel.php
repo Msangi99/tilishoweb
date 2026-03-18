@@ -51,7 +51,7 @@ class Parcel extends Model
             $trackingNumber = "TLS{$number}{$chars}";
         } while (self::where('tracking_number', $trackingNumber)->exists());
 
-        return $trackingNumber;
+        return $trackingNumber; 
     }
 
     public function scannedBy()
