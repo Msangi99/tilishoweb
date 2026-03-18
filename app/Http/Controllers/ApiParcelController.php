@@ -110,7 +110,7 @@ class ApiParcelController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => [
-                'parcel' => $parcel->fresh(['bus', 'scannedBy']),
+                'parcel' => $parcel->fresh(['bus', 'transportedBus', 'scannedBy']),
             ],
         ]);
     }
@@ -157,7 +157,7 @@ class ApiParcelController extends Controller
             'status' => 'success',
             'message' => 'Usafirishaji umehifadhiwa',
             'data' => [
-                'parcel' => $parcel->fresh(['bus', 'scannedBy']),
+                'parcel' => $parcel->fresh(['bus', 'transportedBus', 'scannedBy']),
             ],
         ]);
     }
@@ -203,7 +203,7 @@ class ApiParcelController extends Controller
     public function viewParcel($trackingNumber)
     {
         $parcel = Parcel::where('tracking_number', $trackingNumber)
-            ->with(['bus', 'scannedBy'])
+            ->with(['bus', 'transportedBus', 'scannedBy'])
             ->first();
 
         if (! $parcel) {

@@ -413,8 +413,20 @@
                                         <span class="px-2 py-0.5 rounded-lg border text-[9px] font-black uppercase tracking-widest {{ $statusClasses[$viewingParcel->display_status] ?? '' }}">
                                             {{ $viewingParcel->display_status }}
                                         </span>
-                                        @if($viewingParcel->scanned_by)
-                                            <span class="text-[8px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">Via: {{ $viewingParcel->bus->plate_number ?? 'N/A' }}</span>
+                                        @if($viewingParcel->transported_by_name)
+                                            <span class="text-[8px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">
+                                                Given to: {{ $viewingParcel->transported_by_name }}
+                                            </span>
+                                            <span class="text-[8px] font-bold text-slate-400 mt-0.5 uppercase tracking-tighter">
+                                                Bus: {{ optional($viewingParcel->transportedBus)->plate_number ?? optional($viewingParcel->bus)->plate_number ?? 'N/A' }}
+                                                @if($viewingParcel->transported_route)
+                                                    → {{ $viewingParcel->transported_route }}
+                                                @endif
+                                            </span>
+                                        @elseif($viewingParcel->scanned_by)
+                                            <span class="text-[8px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">
+                                                Via: {{ $viewingParcel->bus->plate_number ?? 'N/A' }}
+                                            </span>
                                         @endif
                                     </div>
                                     <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Status</p>

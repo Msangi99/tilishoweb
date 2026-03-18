@@ -74,6 +74,11 @@ class Parcel extends Model
         return $this->belongsTo(Bus::class);
     }
 
+    public function transportedBus()
+    {
+        return $this->belongsTo(Bus::class, 'transported_bus_id');
+    }
+
     public function getDisplayStatusAttribute()
     {
         if (!$this->travel_date || !$this->start_travel_time || !$this->end_travel_time) {

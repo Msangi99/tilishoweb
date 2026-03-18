@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin Tilisho',
             'username' => 'admin',
             'email' => 'admin@tilishosafari.co.tz',
+            'role' => 'admin',
             'password' => bcrypt('admin123'),
         ]);
 
