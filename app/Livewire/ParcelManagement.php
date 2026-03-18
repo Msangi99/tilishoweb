@@ -53,8 +53,17 @@ class ParcelManagement extends Component
         $this->action = request()->query('action');
         $this->parcelId = request()->query('id');
         $this->travel_date = now()->format('Y-m-d');
-        if ($this->action === 'edit' && $this->parcelId) {
-            $this->editParcel((int) $this->parcelId);
+
+        // Disable editing from web UI – only allow create or list
+        if ($this->action === 'edit') {
+            $this->action = null;
+            $this->parcelId = null;
+            return;
+        }
+
+        if ($this->action === 'create') {
+            // New parcel form; nothing to preload
+            return;
         }
     }
 
@@ -140,20 +149,8 @@ class ParcelManagement extends Component
         $this->validate();
 
         if ($this->editingParcelId) {
-            $parcel = Parcel::findOrFail($this->editingParcelId);
-            $parcel->update([
-                'sender_name' => $this->sender_name,
-                'sender_phone' => $this->sender_phone,
-                'receiver_name' => $this->receiver_name,
-                'receiver_phone' => $this->receiver_phone,
-                'origin' => $this->origin,
-                'destination' => $this->destination,
-                'amount' => $this->amount,
-                'description' => $this->description,
-                'bus_id' => $this->bus_id,
-                'travel_date' => $this->travel_date,
-            ]);
-            session()->flash('message', 'Parcel updated successfully.');
+            // Editing parcels is disabled for safety
+            session()->flash('message', 'Editing existing parcels is not allowed.');
         } else {
             Parcel::create([
                 'sender_name' => $this->sender_name,

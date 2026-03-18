@@ -134,7 +134,7 @@
                     Cancel
                 </a>
                 <button type="submit" class="flex-[2] px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all shadow-2xl shadow-slate-900/20 flex items-center justify-center gap-3">
-                    <span wire:loading.remove wire:target="saveParcel">{{ $editingParcelId ? 'Update Information' : 'Confirm Registration' }}</span>
+                    <span wire:loading.remove wire:target="saveParcel">{{ $editingParcelId ? 'Editing Disabled' : 'Confirm Registration' }}</span>
                     <div wire:loading wire:target="saveParcel" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 </button>
             </div>
@@ -246,15 +246,12 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1">
                                     @if(Auth::user()->role == 'admin' && $parcel->scanned_by)
-                                    <button wire:click.stop="resetScan({{ $parcel->id }})" 
-                                            class="p-2 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors group/btn"
-                                            title="Reset Scan">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                                    </button>
-                                @endif
-                                <a href="{{ route('dashboard', ['view' => 'parcels', 'action' => 'edit', 'id' => $parcel->id]) }}" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors group/btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                    </a>
+                                        <button wire:click.stop="resetScan({{ $parcel->id }})" 
+                                                class="p-2 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors group/btn"
+                                                title="Reset Scan">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                        </button>
+                                    @endif
                                     <button wire:click="deleteParcel({{ $parcel->id }})" wire:confirm="Are you sure you want to delete this parcel?" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                                     </button>
@@ -459,12 +456,7 @@
                         <button @click="showDetails = false; $wire.closeDetails()" class="px-8 py-4 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all">
                             Close Details
                         </button>
-                        <div class="flex gap-2">
-                           <a href="{{ route('dashboard', ['view' => 'parcels', 'action' => 'edit', 'id' => $viewingParcel->id]) }}" @click="showDetails = false" class="px-6 py-4 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                Edit Parcel
-                           </a>
-                        </div>
+                        <div class="flex gap-2"></div>
                     </div>
                 </div>
                 @endif
