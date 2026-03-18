@@ -63,7 +63,7 @@ Msaada:0750015630");
         $cargo = $this->cargo($parcel);
         $qty = 1;
         $fare = $this->fare($parcel);
-        $office = $parcel->transported_route ?: ($parcel->destination ?? '');
+        $office = $parcel->destination ;
 
         return trim("TILISHO PARCEL
 Habari {$parcel->receiver_name}, mzigo wako {$parcel->tracking_number} kutoka kwa {$parcel->sender_name} upo ofisini {$office}
