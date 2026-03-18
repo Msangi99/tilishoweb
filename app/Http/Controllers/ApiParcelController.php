@@ -24,7 +24,7 @@ class ApiParcelController extends Controller
         }
 
         $query = Parcel::where('created_by', $user->id)
-            ->with(['bus', 'scannedBy']);
+            ->with(['bus', 'transportedBus', 'scannedBy', 'createdBy']);
 
         if ($date) {
             $query->whereDate('travel_date', $date);
@@ -33,6 +33,13 @@ class ApiParcelController extends Controller
         }
 
         $parcels = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        // Append creator info for app
+        $parcels->getCollection()->transform(function (Parcel $p) {
+            $p->created_by_name = optional($p->createdBy)->name;
+            $p->created_by_phone = optional($p->createdBy)->phone;
+            return $p;
+        });
 
         return response()->json([
             'status' => 'success',
@@ -87,11 +94,16 @@ class ApiParcelController extends Controller
             'created_by' => $user->id,
         ]);
 
+        // Append creator info for app
+        $parcel->load(['bus', 'transportedBus', 'scannedBy', 'createdBy']);
+        $parcel->created_by_name = optional($parcel->createdBy)->name;
+        $parcel->created_by_phone = optional($parcel->createdBy)->phone;
+
         return response()->json([
             'status' => 'success',
             'message' => 'Parcel created successfully',
             'data' => [
-                'parcel' => $parcel->load(['bus', 'scannedBy']),
+                'parcel' => $parcel,
             ],
         ], 201);
     }
@@ -105,12 +117,17 @@ class ApiParcelController extends Controller
             'tracking_number' => 'required|string|exists:parcels,tracking_number',
         ]);
 
-        $parcel = Parcel::where('tracking_number', $validated['tracking_number'])->first();
+        $parcel = Parcel::where('tracking_number', $validated['tracking_number'])
+            ->with(['bus', 'transportedBus', 'scannedBy', 'createdBy'])
+            ->first();
+
+        $parcel->created_by_name = optional($parcel->createdBy)->name;
+        $parcel->created_by_phone = optional($parcel->createdBy)->phone;
 
         return response()->json([
             'status' => 'success',
             'data' => [
-                'parcel' => $parcel->fresh(['bus', 'transportedBus', 'scannedBy']),
+                'parcel' => $parcel->fresh(['bus', 'transportedBus', 'scannedBy', 'createdBy']),
             ],
         ]);
     }
@@ -127,7 +144,9 @@ class ApiParcelController extends Controller
             'worker_role' => 'nullable|string|max:50',
         ]);
 
-        $parcel = Parcel::where('tracking_number', $validated['tracking_number'])->first();
+        $parcel = Parcel::where('tracking_number', $validated['tracking_number'])
+            ->with(['bus', 'transportedBus', 'scannedBy', 'createdBy'])
+            ->first();
         $bus = $user->assignedBus();
 
         if (! $bus) {
@@ -157,7 +176,7 @@ class ApiParcelController extends Controller
             'status' => 'success',
             'message' => 'Usafirishaji umehifadhiwa',
             'data' => [
-                'parcel' => $parcel->fresh(['bus', 'transportedBus', 'scannedBy']),
+                'parcel' => $parcel->fresh(['bus', 'transportedBus', 'scannedBy', 'createdBy']),
             ],
         ]);
     }
@@ -203,7 +222,7 @@ class ApiParcelController extends Controller
     public function viewParcel($trackingNumber)
     {
         $parcel = Parcel::where('tracking_number', $trackingNumber)
-            ->with(['bus', 'transportedBus', 'scannedBy'])
+            ->with(['bus', 'transportedBus', 'scannedBy', 'createdBy'])
             ->first();
 
         if (! $parcel) {
@@ -212,6 +231,10 @@ class ApiParcelController extends Controller
                 'message' => 'Parcel haijapatikana',
             ], 404);
         }
+
+        // Append creator info for app
+        $parcel->created_by_name = optional($parcel->createdBy)->name;
+        $parcel->created_by_phone = optional($parcel->createdBy)->phone;
 
         return response()->json([
             'status' => 'success',
