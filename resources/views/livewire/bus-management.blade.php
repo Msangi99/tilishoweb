@@ -11,123 +11,123 @@
     </div>
 
     <!-- Inline Create/Edit Form (centered, 80% width max) -->
-    <div class="w-full flex justify-center">
+    <div class="w-full flex justify-center mb-6">
         <div class="w-[80%] max-w-4xl bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
-            <div>
-                <h3 class="text-sm font-bold text-slate-900">{{ $editingBusId ? 'Revise Fleet Asset' : 'Register New Asset' }}</h3>
-                <p class="text-[11px] text-slate-500 font-medium">Asset &amp; crew configuration.</p>
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900">{{ $editingBusId ? 'Revise Fleet Asset' : 'Register New Asset' }}</h3>
+                    <p class="text-[11px] text-slate-500 font-medium">Asset &amp; crew configuration.</p>
+                </div>
+                @if (session()->has('message'))
+                    <span class="text-[11px] font-semibold text-emerald-600">{{ session('message') }}</span>
+                @endif
             </div>
-            @if (session()->has('message'))
-                <span class="text-[11px] font-semibold text-emerald-600">{{ session('message') }}</span>
-            @endif
-        </div>
-        <div class="p-6 border-b border-slate-100">
-            <form wire:submit.prevent="saveBus" class="space-y-6">
-                <!-- Core Asset Info -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-semibold text-slate-700 px-0.5">Bus Number (Plate)</label>
-                        <input wire:model="plate_number" type="text" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="e.g. T 123 ABC">
-                        @error('plate_number') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-semibold text-slate-700 px-0.5">Assigned Route</label>
-                        <select wire:model="route_id" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                            <option value="">--- Not Assigned ---</option>
-                            @foreach($routes as $rt)
-                                <option value="{{ $rt->id }}">{{ $rt->from }} → {{ $rt->to }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Dynamic Staff Sections (assign existing users to this bus) -->
-                <div class="space-y-4">
-                    <!-- Drivers -->
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between px-0.5">
-                            <h4 class="text-xs font-bold text-slate-900 uppercase tracking-widest">Dereva (Drivers)</h4>
-                            <span class="text-[10px] text-slate-400 font-medium">Search &amp; select users</span>
+            <div class="p-6 border-t border-slate-100">
+                <form wire:submit.prevent="saveBus" class="space-y-6">
+                    <!-- Core Asset Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-700 px-0.5">Bus Number (Plate)</label>
+                            <input wire:model="plate_number" type="text" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="e.g. T 123 ABC">
+                            @error('plate_number') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                         </div>
-                        <div wire:ignore>
-                            <select
-                                id="drivers-select"
-                                multiple
-                                class="select2-users w-full"
-                            >
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}"
-                                        @if(in_array($user->id, $drivers ?? [])) selected @endif
-                                    >
-                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
-                                    </option>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-700 px-0.5">Assigned Route</label>
+                            <select wire:model="route_id" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                                <option value="">--- Not Assigned ---</option>
+                                @foreach($routes as $rt)
+                                    <option value="{{ $rt->id }}">{{ $rt->from }} → {{ $rt->to }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        @error('drivers.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                     </div>
 
-                    <!-- Conductors -->
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between px-0.5">
-                            <h4 class="text-xs font-bold text-slate-900 uppercase tracking-widest">Kondakta (Conductors)</h4>
-                            <span class="text-[10px] text-slate-400 font-medium">Search &amp; select users</span>
+                    <!-- Dynamic Staff Sections (assign existing users to this bus) -->
+                    <div class="space-y-4">
+                        <!-- Drivers -->
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between px-0.5">
+                                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-widest">Dereva (Drivers)</h4>
+                                <span class="text-[10px] text-slate-400 font-medium">Search &amp; select users</span>
+                            </div>
+                            <div wire:ignore>
+                                <select
+                                    id="drivers-select"
+                                    multiple
+                                    class="select2-users w-full"
+                                >
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}"
+                                            @if(in_array($user->id, $drivers ?? [])) selected @endif
+                                        >
+                                            {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @error('drivers.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                         </div>
-                        <div wire:ignore>
-                            <select
-                                id="conductors-select"
-                                multiple
-                                class="select2-users w-full"
-                            >
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}"
-                                        @if(in_array($user->id, $conductors ?? [])) selected @endif
-                                    >
-                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
+
+                        <!-- Conductors -->
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between px-0.5">
+                                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-widest">Kondakta (Conductors)</h4>
+                                <span class="text-[10px] text-slate-400 font-medium">Search &amp; select users</span>
+                            </div>
+                            <div wire:ignore>
+                                <select
+                                    id="conductors-select"
+                                    multiple
+                                    class="select2-users w-full"
+                                >
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}"
+                                            @if(in_array($user->id, $conductors ?? [])) selected @endif
+                                        >
+                                            {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @error('conductors.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
                         </div>
-                        @error('conductors.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
+
+                        <!-- Attendants -->
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between px-0.5">
+                                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-widest">Mhudumu (Attendants)</h4>
+                                <span class="text-[10px] text-slate-400 font-medium">Search &amp; select users</span>
+                            </div>
+                            <div wire:ignore>
+                                <select
+                                    id="attendants-select"
+                                    multiple
+                                    class="select2-users w-full"
+                                >
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}"
+                                            @if(in_array($user->id, $attendants ?? [])) selected @endif
+                                        >
+                                            {{ $user->name }} ({{ $user->username ?? $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @error('attendants.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
-                    <!-- Attendants -->
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between px-0.5">
-                            <h4 class="text-xs font-bold text-slate-900 uppercase tracking-widest">Mhudumu (Attendants)</h4>
-                            <span class="text-[10px] text-slate-400 font-medium">Search &amp; select users</span>
-                        </div>
-                        <div wire:ignore>
-                            <select
-                                id="attendants-select"
-                                multiple
-                                class="select2-users w-full"
-                            >
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}"
-                                        @if(in_array($user->id, $attendants ?? [])) selected @endif
-                                    >
-                                        {{ $user->name }} ({{ $user->username ?? $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @error('attendants.*') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
+                    <!-- Actions -->
+                    <div class="pt-4 flex gap-3">
+                        <button type="button" wire:click="cancelEdit" class="flex-1 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl text-xs font-bold transition-all border border-slate-200">
+                            Discard
+                        </button>
+                        <button type="submit" class="flex-[2] px-6 py-3 bg-slate-900 hover:bg-slate-850 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20">
+                            {{ $editingBusId ? 'Commit Changes' : 'Finalize Registration' }}
+                        </button>
                     </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="pt-4 flex gap-3">
-                    <button type="button" wire:click="cancelEdit" class="flex-1 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl text-xs font-bold transition-all border border-slate-200">
-                        Discard
-                    </button>
-                    <button type="submit" class="flex-[2] px-6 py-3 bg-slate-900 hover:bg-slate-850 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20">
-                        {{ $editingBusId ? 'Commit Changes' : 'Finalize Registration' }}
-                    </button>
-                </div>
-            </form>
-        </div>
+                </form>
+            </div>
         </div>
     </div>
 
