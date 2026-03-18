@@ -1,7 +1,9 @@
 <x-layouts.admin>
     <div 
         class="flex min-h-screen bg-slate-50"
-        x-data="{ currentView: '{{ request()->query('view', 'dashboard') }}', sidebarOpen: false }"
+        x-data="{ currentView: '{{ request()->query('view', 'dashboard') }}', sidebarOpen: window.innerWidth >= 768 }"
+        x-init="sidebarOpen = window.innerWidth >= 768"
+        @resize.window="sidebarOpen = window.innerWidth >= 768 ? true : sidebarOpen"
     >
         <!-- Mobile sidebar backdrop -->
         <div 
