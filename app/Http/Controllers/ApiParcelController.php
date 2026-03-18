@@ -6,6 +6,8 @@ use App\Models\Parcel;
 use App\Models\Bus;
 use App\Models\BusRoute;
 use App\Models\User;
+use App\Services\Sms\ParcelSmsComposer;
+use App\Services\Sms\SmsCoTzClient;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -115,6 +117,16 @@ class ApiParcelController extends Controller
         $parcel->created_by_name = optional($parcel->createdBy)->name;
         $parcel->created_by_phone = optional($parcel->createdBy)->phone;
 
+        // SMS notifications (best-effort)
+        try {
+            $sms = app(SmsCoTzClient::class);
+            $composer = app(ParcelSmsComposer::class);
+            $sms->send($parcel->sender_phone, $composer->createdForSender($parcel));
+            $sms->send($parcel->receiver_phone, $composer->createdForReceiver($parcel));
+        } catch (\Throwable $e) {
+            \Log::warning('Parcel created SMS failed', ['error' => $e->getMessage()]);
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'Parcel created successfully',
@@ -222,6 +234,16 @@ class ApiParcelController extends Controller
             'received_at' => now(),
             'status' => 'received',
         ]);
+
+        // SMS notification to receiver (best-effort)
+        try {
+            $parcelFresh = $parcel->fresh();
+            $sms = app(SmsCoTzClient::class);
+            $composer = app(ParcelSmsComposer::class);
+            $sms->send($parcelFresh->receiver_phone, $composer->receivedNotice($parcelFresh));
+        } catch (\Throwable $e) {
+            \Log::warning('Parcel received SMS failed', ['error' => $e->getMessage()]);
+        }
 
         return response()->json([
             'status' => 'success',

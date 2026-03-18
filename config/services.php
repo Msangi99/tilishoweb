@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    // SMS.co.tz settings are managed in DB via System Settings:
+    // keys: sms_enabled, sms_sender_id, sms_api_key
+    // (see app/Livewire/SystemSettings.php)
+
 ];

@@ -16,6 +16,15 @@
             <legend class="px-3 text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] bg-white ml-2">SMS API Configuration (SMS.co.tz)</legend>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                <div class="space-y-2 md:col-span-2">
+                    <label class="text-xs font-bold text-slate-700 px-1">Enable SMS</label>
+                    <label class="inline-flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl w-full">
+                        <input wire:model="sms_enabled" type="checkbox" class="rounded border-slate-300">
+                        <span class="text-sm font-bold text-slate-900">Send automated parcel SMS notifications</span>
+                    </label>
+                    @error('sms_enabled') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
+                </div>
+
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-700 px-1">Sender ID</label>
                     <input wire:model="sender_id" type="text" 
