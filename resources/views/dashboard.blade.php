@@ -359,7 +359,7 @@
                                 async loadStats() {
                                     this.loading = true;
                                     try {
-                                        const response = await fetch('{{ url('/api/dashboard') }}', {
+                                        const response = await fetch('{{ route('dashboard.stats') }}', {
                                             headers: {
                                                 'Accept': 'application/json',
                                             },
