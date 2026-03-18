@@ -1,6 +1,6 @@
 <x-layouts.admin>
     <div 
-        class="flex min-h-screen bg-slate-50 overflow-hidden"
+        class="flex min-h-screen bg-slate-50"
         x-data="{ currentView: '{{ request()->query('view', 'dashboard') }}', sidebarOpen: false }"
     >
         <!-- Mobile sidebar backdrop -->
@@ -13,7 +13,7 @@
 
         <!-- Sidebar -->
         <aside 
-            class="fixed inset-y-0 left-0 z-30 w-64 md:w-1/6 md:min-w-[260px] bg-[#1a2234] text-slate-300 flex-shrink-0 flex flex-col shadow-xl transform transition-transform duration-200 ease-in-out md:static"
+            class="fixed inset-y-0 left-0 z-30 w-64 md:w-64 bg-[#1a2234] text-slate-300 flex-shrink-0 flex flex-col shadow-xl transform transition-transform duration-200 ease-in-out"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
         >
             <!-- Sidebar Header -->
@@ -66,7 +66,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col relative z-10 bg-slate-50 md:ml-0">
+        <main class="flex-1 flex flex-col relative z-10 bg-slate-50 md:ml-64">
             <!-- Top Header -->
             <header class="h-20 bg-white/80 backdrop-blur-md border-b flex items-center justify-between px-4 md:px-10 sticky top-0 z-10">
                 <div class="flex items-center gap-3">
