@@ -1,7 +1,21 @@
 <x-layouts.admin>
-    <div class="flex h-screen bg-slate-50 overflow-hidden" x-data="{ currentView: '{{ request()->query('view', 'dashboard') }}' }">
+    <div 
+        class="flex min-h-screen bg-slate-50 overflow-hidden"
+        x-data="{ currentView: '{{ request()->query('view', 'dashboard') }}', sidebarOpen: false }"
+    >
+        <!-- Mobile sidebar backdrop -->
+        <div 
+            x-show="sidebarOpen"
+            x-transition.opacity
+            class="fixed inset-0 z-20 bg-slate-900/60 md:hidden"
+            @click="sidebarOpen = false"
+        ></div>
+
         <!-- Sidebar -->
-        <aside class="w-1/6 min-w-[260px] bg-[#1a2234] text-slate-300 flex-shrink-0 flex flex-col shadow-xl z-20">
+        <aside 
+            class="fixed inset-y-0 left-0 z-30 w-64 md:w-1/6 md:min-w-[260px] bg-[#1a2234] text-slate-300 flex-shrink-0 flex flex-col shadow-xl transform transition-transform duration-200 ease-in-out md:static"
+            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+        >
             <!-- Sidebar Header -->
             <div class="p-8 flex flex-col items-center gap-4">
                 <div class="w-full h-16 flex items-center justify-center p-2 bg-white/5 rounded-xl border border-white/10 overflow-hidden">
@@ -52,12 +66,25 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col relative z-10 bg-slate-50">
+        <main class="flex-1 flex flex-col relative z-10 bg-slate-50 md:ml-0">
             <!-- Top Header -->
-            <header class="h-20 bg-white/80 backdrop-blur-md border-b flex items-center justify-between px-10 sticky top-0 z-10">
-                <div class="flex flex-col">
+            <header class="h-20 bg-white/80 backdrop-blur-md border-b flex items-center justify-between px-4 md:px-10 sticky top-0 z-10">
+                <div class="flex items-center gap-3">
+                    <!-- Mobile menu button -->
+                    <button 
+                        class="inline-flex items-center justify-center p-2 rounded-lg text-slate-600 hover:bg-slate-100 md:hidden"
+                        @click="sidebarOpen = true"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <line x1="3" y1="18" x2="21" y2="18" />
+                        </svg>
+                    </button>
+                    <div class="flex flex-col">
                     <h1 class="text-xl font-bold text-slate-900">System Dashboard</h1>
                     <p class="text-[11px] text-slate-500 font-medium">Welcome back to the management portal</p>
+                    </div>
                 </div>
                 <div class="flex items-center gap-6">
                     <div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-full text-[11px] font-bold text-slate-600 border border-slate-200">
