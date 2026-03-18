@@ -26,7 +26,8 @@
         <div class="w-24"></div>
     </div>
 
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden max-w-4xl mx-auto">
+    <div class="w-full flex justify-center">
+        <div class="w-[80%] max-w-4xl bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="px-8 pt-8 pb-4 border-b border-slate-100">
             <h3 class="text-xl font-black text-slate-900 tracking-tight">{{ $editingParcelId ? 'Edit Parcel' : 'Register New Parcel' }}</h3>
             <p class="text-[11px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-2">Enter shipment details below</p>
@@ -35,7 +36,8 @@
             @endif
         </div>
 
-        <form wire:submit="saveParcel" class="p-8 space-y-6">
+        <div class="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        <form wire:submit="saveParcel" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-6">
                     <div class="flex items-center gap-2 mb-2">
@@ -44,12 +46,12 @@
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Name</label>
-                        <input wire:model="sender_name" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="Sender's Name">
+                        <input wire:model="sender_name" type="text" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Sender's Name">
                         @error('sender_name') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Phone Number</label>
-                        <input wire:model="sender_phone" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="+255 700...">
+                        <input wire:model="sender_phone" type="text" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="+255 700...">
                         @error('sender_phone') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
@@ -60,12 +62,12 @@
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Name</label>
-                        <input wire:model="receiver_name" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="Receiver's Name">
+                        <input wire:model="receiver_name" type="text" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Receiver's Name">
                         @error('receiver_name') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Phone Number</label>
-                        <input wire:model="receiver_phone" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="+255 700...">
+                        <input wire:model="receiver_phone" type="text" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="+255 700...">
                         @error('receiver_phone') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
@@ -105,12 +107,12 @@
                 <div class="grid grid-cols-2 gap-8">
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Amount (TZS)</label>
-                        <input wire:model="amount" type="number" step="0.01" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                        <input wire:model="amount" type="number" step="0.01" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                         @error('amount') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Status</label>
-                        <select wire:model="status" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                        <select wire:model="status" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                             <option value="pending">Pending</option>
                             <option value="in-transit">In Transit</option>
                             <option value="delivered">Delivered</option>
@@ -121,7 +123,7 @@
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Description</label>
-                    <textarea wire:model="description" rows="3" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="Describe the parcel content..."></textarea>
+                    <textarea wire:model="description" rows="3" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Describe the parcel content..."></textarea>
                     @error('description') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -136,6 +138,7 @@
                 </button>
             </div>
         </form>
+        </div>
     </div>
     @else
     {{-- Parcel list page --}}

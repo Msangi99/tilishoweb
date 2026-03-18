@@ -12,8 +12,8 @@ class BusManagement extends Component
 {
     use WithPagination;
 
-    /** When false, show create form first (default). When true, show list of buses. */
-    public $showList = false;
+    /** When true, show list of buses (default). When false, show create/edit form. */
+    public $showList = true;
 
     public $search = '';
     public $perPage = 10;
