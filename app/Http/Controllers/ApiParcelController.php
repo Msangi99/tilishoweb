@@ -12,19 +12,34 @@ use Carbon\Carbon;
 class ApiParcelController extends Controller
 {
     /**
-     * Get parcels created by the authenticated user (staff).
+     * Get parcels for the authenticated user (staff).
      * Optional query: date (Y-m-d) to filter by travel_date; default is today.
+     * Optional query: type = created|transported|received; default is created.
      */
     public function myParcels(Request $request)
     {
         $user = $request->user();
         $date = $request->query('date');
+        $type = $request->query('type', 'created');
+
+        $request->validate([
+            'type' => 'nullable|in:created,transported,received',
+        ]);
+
         if ($date !== null && $date !== '') {
             $request->validate(['date' => 'date_format:Y-m-d']);
         }
 
-        $query = Parcel::where('created_by', $user->id)
+        $query = Parcel::query()
             ->with(['bus', 'transportedBus', 'scannedBy', 'createdBy']);
+
+        if ($type === 'transported') {
+            $query->where('transported_by_id', $user->id);
+        } elseif ($type === 'received') {
+            $query->where('received_by_id', $user->id);
+        } else {
+            $query->where('created_by', $user->id);
+        }
 
         if ($date) {
             $query->whereDate('travel_date', $date);

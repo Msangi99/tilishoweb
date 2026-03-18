@@ -90,25 +90,25 @@ class ApiAuthController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|nullable|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'sometimes|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'sometimes|nullable|string|max:20',
             'username' => 'sometimes|string|max:255|unique:users,username,' . $user->id,
             'password' => 'sometimes|nullable|string|min:6|confirmed',
         ]);
 
-        if (!empty($validated['name'])) {
+        if (array_key_exists('name', $validated)) {
             $user->name = $validated['name'];
         }
-        if (array_key_exists('email')) {
-            $user->email = $validated['email'] ?? null;
+        if (array_key_exists('email', $validated)) {
+            $user->email = $validated['email'];
         }
-        if (array_key_exists('phone')) {
+        if (array_key_exists('phone', $validated)) {
             $user->phone = $validated['phone'] ?? null;
         }
-        if (!empty($validated['username'])) {
+        if (array_key_exists('username', $validated)) {
             $user->username = $validated['username'];
         }
-        if (!empty($validated['password'])) {
+        if (!empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
         }
         $user->save();
