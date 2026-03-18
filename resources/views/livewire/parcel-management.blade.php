@@ -505,87 +505,85 @@
                                 --------------------------------------------
                             </div>
 
-                            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="space-y-2">
-                                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Sender</p>
-                                    <p class="text-sm font-semibold text-slate-900">{{ $viewingParcel->sender_name }}</p>
-                                    <p class="text-xs font-mono text-slate-600">{{ $viewingParcel->sender_phone }}</p>
-                                </div>
-                                <div class="space-y-2">
-                                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Receiver</p>
-                                    <p class="text-sm font-semibold text-slate-900">{{ $viewingParcel->receiver_name }}</p>
-                                    <p class="text-xs font-mono text-slate-600">{{ $viewingParcel->receiver_phone }}</p>
-                                </div>
-                            </div>
-
-                            <div class="mt-6 text-center text-[11px] text-slate-400 tracking-[0.3em] font-black">
-                                --------------------------------------------
-                            </div>
-
-                            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="space-y-2">
-                                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Route</p>
-                                    <p class="text-sm font-semibold text-slate-900">
-                                        {{ $viewingParcel->origin }} &rarr; {{ $viewingParcel->destination }}
-                                    </p>
-                                    <p class="text-xs text-slate-500">
-                                        Travel date:
-                                        <span class="font-mono">
-                                            {{ $viewingParcel->travel_date ? \Carbon\Carbon::parse($viewingParcel->travel_date)->format('Y-m-d') : 'N/A' }}
-                                        </span>
-                                    </p>
-                                </div>
-                                <div class="space-y-2">
-                                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Amount &
-                                        Status</p>
-                                    <p class="text-sm font-black text-slate-900">
-                                        TZS {{ number_format($viewingParcel->amount) }}
-                                    </p>
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <span
-                                            class="px-2 py-0.5 rounded-lg border text-[10px] font-black uppercase tracking-widest {{ $statusClasses[$viewingParcel->display_status] ?? '' }}">
-                                            {{ $viewingParcel->display_status }}
-                                        </span>
-                                        @if($viewingParcel->transported_by_name)
-                                            <span class="text-[10px] font-semibold text-slate-500">
-                                                Given to: {{ $viewingParcel->transported_by_name }}
-                                            </span>
-                                        @endif
-                                        @if($viewingParcel->received_by_name)
-                                            <span class="text-[10px] font-semibold text-emerald-600">
-                                                Received by: {{ $viewingParcel->received_by_name }}
-                                            </span>
-                                        @endif
+                            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div class="space-y-6">
+                                    <div class="space-y-2">
+                                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Sender</p>
+                                        <p class="text-sm font-semibold text-slate-900">{{ $viewingParcel->sender_name }}</p>
+                                        <p class="text-xs font-mono text-slate-600">{{ $viewingParcel->sender_phone }}</p>
                                     </div>
-                                    @if($viewingParcel->transported_at || $viewingParcel->received_at)
-                                        <div class="space-y-1 text-[10px] text-slate-500 mt-1">
-                                            @if($viewingParcel->transported_at)
-                                                <p>
-                                                    Imported at:
-                                                    <span class="font-mono">{{ $viewingParcel->transported_at }}</span>
-                                                </p>
+                                    <div class="space-y-2">
+                                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Receiver</p>
+                                        <p class="text-sm font-semibold text-slate-900">{{ $viewingParcel->receiver_name }}</p>
+                                        <p class="text-xs font-mono text-slate-600">{{ $viewingParcel->receiver_phone }}</p>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">
+                                            Description
+                                        </p>
+                                        <p class="text-sm text-slate-700 italic">
+                                            "{{ $viewingParcel->description ?: 'No description provided.' }}"
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-6">
+                                    <div class="space-y-2">
+                                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Route</p>
+                                        <p class="text-sm font-semibold text-slate-900">
+                                            {{ $viewingParcel->origin }} &rarr; {{ $viewingParcel->destination }}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            Travel date:
+                                            <span class="font-mono">
+                                                {{ $viewingParcel->travel_date ? \Carbon\Carbon::parse($viewingParcel->travel_date)->format('Y-m-d') : 'N/A' }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Amount &
+                                            Status</p>
+                                        <p class="text-sm font-black text-slate-900">
+                                            TZS {{ number_format($viewingParcel->amount) }}
+                                        </p>
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <span
+                                                class="px-2 py-0.5 rounded-lg border text-[10px] font-black uppercase tracking-widest {{ $statusClasses[$viewingParcel->display_status] ?? '' }}">
+                                                {{ $viewingParcel->display_status }}
+                                            </span>
+                                            @if($viewingParcel->transported_by_name)
+                                                <span class="text-[10px] font-semibold text-slate-500">
+                                                    Given to: {{ $viewingParcel->transported_by_name }}
+                                                </span>
                                             @endif
-                                            @if($viewingParcel->received_at)
-                                                <p>
-                                                    Received at:
-                                                    <span class="font-mono">{{ $viewingParcel->received_at }}</span>
-                                                </p>
+                                            @if($viewingParcel->received_by_name)
+                                                <span class="text-[10px] font-semibold text-emerald-600">
+                                                    Received by: {{ $viewingParcel->received_by_name }}
+                                                </span>
                                             @endif
                                         </div>
-                                    @endif
+                                        @if($viewingParcel->transported_at || $viewingParcel->received_at)
+                                            <div class="space-y-1 text-[10px] text-slate-500 mt-1">
+                                                @if($viewingParcel->transported_at)
+                                                    <p>
+                                                        Imported at:
+                                                        <span class="font-mono">{{ $viewingParcel->transported_at }}</span>
+                                                    </p>
+                                                @endif
+                                                @if($viewingParcel->received_at)
+                                                    <p>
+                                                        Received at:
+                                                        <span class="font-mono">{{ $viewingParcel->received_at }}</span>
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="mt-6 text-center text-[11px] text-slate-400 tracking-[0.3em] font-black">
                                 --------------------------------------------
-                            </div>
-
-                            <div class="mt-6">
-                                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Description
-                                </p>
-                                <p class="text-sm text-slate-700 italic">
-                                    "{{ $viewingParcel->description ?: 'No description provided.' }}"
-                                </p>
                             </div>
 
                             <div class="mt-8 flex items-center justify-between">
