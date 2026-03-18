@@ -1,43 +1,153 @@
-<div class="space-y-6" x-data="{ 
-    showModal: false, 
-    showQrModal: false, 
-    qrCodeUrl: '', 
+<div class="space-y-6" x-data="{
+    showQrModal: false,
+    qrCodeUrl: '',
     qrTrackingId: '',
     showDetails: @entangle('showDetailsModal'),
     initSelect2() {
+        if (typeof $ === 'undefined' || !$(this.$refs.originSelect).length) return;
         if ($(this.$refs.originSelect).hasClass('select2-hidden-accessible')) {
             $(this.$refs.originSelect).select2('destroy');
             $(this.$refs.destinationSelect).select2('destroy');
         }
-
-        $(this.$refs.originSelect).select2({ 
-            tags: true, 
-            placeholder: 'Select origin', 
-            width: '100%',
-            dropdownParent: $(this.$el)
-        }).on('change', (e) => { $wire.set('origin', e.target.value); });
-
-        $(this.$refs.destinationSelect).select2({ 
-            tags: true,
-            placeholder: 'Select destination',
-            width: '100%',
-            dropdownParent: $(this.$el)
-        }).on('change', (e) => { $wire.set('destination', e.target.value); });
-        
-        // Push current values to Select2
+        $(this.$refs.originSelect).select2({ tags: true, placeholder: 'Select origin', width: '100%', dropdownParent: $(this.$el) }).on('change', (e) => { $wire.set('origin', e.target.value); });
+        $(this.$refs.destinationSelect).select2({ tags: true, placeholder: 'Select destination', width: '100%', dropdownParent: $(this.$el) }).on('change', (e) => { $wire.set('destination', e.target.value); });
         $(this.$refs.originSelect).val($wire.origin).trigger('change');
         $(this.$refs.destinationSelect).val($wire.destination).trigger('change');
     }
-}" @open-parcel-modal.window="showModal = true; $nextTick(() => { initSelect2(); });" @parcel-saved.window="showModal = false">
+}">
+    @if($action === 'create' || ($action === 'edit' && $parcelId))
+    {{-- Create / Edit Parcel page --}}
+    <div class="flex items-center justify-between mb-6" x-init="$nextTick(() => { initSelect2(); })">
+        <a href="{{ route('dashboard', ['view' => 'parcels']) }}" class="flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl text-sm font-bold transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            Back to list
+        </a>
+        <h2 class="text-2xl font-bold text-slate-900 font-inter tracking-tight">{{ $action === 'edit' ? 'Edit Parcel' : 'Register New Parcel' }}</h2>
+        <div class="w-24"></div>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden max-w-4xl mx-auto">
+        <div class="px-8 pt-8 pb-4 border-b border-slate-100">
+            <h3 class="text-xl font-black text-slate-900 tracking-tight">{{ $editingParcelId ? 'Edit Parcel' : 'Register New Parcel' }}</h3>
+            <p class="text-[11px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-2">Enter shipment details below</p>
+            @if (session()->has('message'))
+                <p class="text-sm font-semibold text-emerald-600 mt-2">{{ session('message') }}</p>
+            @endif
+        </div>
+
+        <form wire:submit="saveParcel" class="p-8 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                        <h4 class="text-[10px] font-black uppercase text-slate-900 tracking-widest">Sender Details</h4>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Name</label>
+                        <input wire:model="sender_name" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="Sender's Name">
+                        @error('sender_name') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Phone Number</label>
+                        <input wire:model="sender_phone" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="+255 700...">
+                        @error('sender_phone') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-1.5 h-6 bg-emerald-600 rounded-full"></div>
+                        <h4 class="text-[10px] font-black uppercase text-slate-900 tracking-widest">Receiver Details</h4>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Name</label>
+                        <input wire:model="receiver_name" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="Receiver's Name">
+                        @error('receiver_name') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Phone Number</label>
+                        <input wire:model="receiver_phone" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="+255 700...">
+                        @error('receiver_phone') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-1.5 h-6 bg-slate-900 rounded-full"></div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-900 tracking-widest">Shipment Info</h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Origin (From)</label>
+                        <div wire:ignore>
+                            <select x-ref="originSelect" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                                <option value=""></option>
+                                @foreach($stations as $station)
+                                    <option value="{{ $station }}" {{ $origin == $station ? 'selected' : '' }}>{{ $station }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @error('origin') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Destination (To)</label>
+                        <div wire:ignore>
+                            <select x-ref="destinationSelect" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                                <option value=""></option>
+                                @foreach($stations as $station)
+                                    <option value="{{ $station }}" {{ $destination == $station ? 'selected' : '' }}>{{ $station }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @error('destination') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Amount (TZS)</label>
+                        <input wire:model="amount" type="number" step="0.01" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                        @error('amount') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Status</label>
+                        <select wire:model="status" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                            <option value="pending">Pending</option>
+                            <option value="in-transit">In Transit</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        @error('status') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Description</label>
+                    <textarea wire:model="description" rows="3" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="Describe the parcel content..."></textarea>
+                    @error('description') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            <div class="pt-6 flex gap-4">
+                <a href="{{ route('dashboard', ['view' => 'parcels']) }}" class="flex-1 px-8 py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border border-slate-200 text-center">
+                    Cancel
+                </a>
+                <button type="submit" class="flex-[2] px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all shadow-2xl shadow-slate-900/20 flex items-center justify-center gap-3">
+                    <span wire:loading.remove wire:target="saveParcel">{{ $editingParcelId ? 'Update Information' : 'Confirm Registration' }}</span>
+                    <div wire:loading wire:target="saveParcel" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                </button>
+            </div>
+        </form>
+    </div>
+    @else
+    {{-- Parcel list page --}}
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-2xl font-bold text-slate-900 font-inter tracking-tight">Parcel Management</h2>
             <p class="text-sm text-slate-500 font-medium">Register and track shipments across the network.</p>
         </div>
-        <button @click="showModal = true; $wire.cancelEdit()" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10 active:scale-95">
+        <a href="{{ route('dashboard', ['view' => 'parcels', 'action' => 'create']) }}" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10 active:scale-95">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
             Register New Parcel
-        </button>
+        </a>
     </div>
 
     <!-- DataTable Container -->
@@ -138,9 +248,9 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                                     </button>
                                 @endif
-                                <button wire:click.stop="editParcel({{ $parcel->id }})" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors group/btn">
+                                <a href="{{ route('dashboard', ['view' => 'parcels', 'action' => 'edit', 'id' => $parcel->id]) }}" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors group/btn">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                    </button>
+                                    </a>
                                     <button wire:click="deleteParcel({{ $parcel->id }})" wire:confirm="Are you sure you want to delete this parcel?" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                                     </button>
@@ -169,128 +279,7 @@
             {{ $parcels->links() }}
         </div>
     </div>
-
-    <!-- Registration Modal -->
-    <div x-show="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
-        <div class="w-full max-w-xl max-h-[70vh] bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden flex flex-col">
-            <div x-show="showModal" class="flex-1 flex flex-col">
-                <div class="px-8 pt-8 pb-4 border-b border-slate-100">
-                    <h3 class="text-2xl font-black text-slate-900 tracking-tight">{{ $editingParcelId ? 'Edit Parcel' : 'Register New Parcel' }}</h3>
-                    <p class="text-[11px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-2">Enter shipment details below</p>
-                </div>
-
-                <form wire:submit="saveParcel" class="p-8 space-y-6 overflow-y-auto custom-scrollbar">
-                    <!-- Sender and Receiver Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <!-- Sender Section -->
-                        <div class="space-y-6">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
-                                <h4 class="text-[10px] font-black uppercase text-slate-900 tracking-widest">Sender Details</h4>
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Name</label>
-                                <input wire:model="sender_name" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="Sender's Name">
-                                @error('sender_name') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Phone Number</label>
-                                <input wire:model="sender_phone" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="+255 700...">
-                                @error('sender_phone') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        <!-- Receiver Section -->
-                        <div class="space-y-6">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="w-1.5 h-6 bg-emerald-600 rounded-full"></div>
-                                <h4 class="text-[10px] font-black uppercase text-slate-900 tracking-widest">Receiver Details</h4>
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Name</label>
-                                <input wire:model="receiver_name" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="Receiver's Name">
-                                @error('receiver_name') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Phone Number</label>
-                                <input wire:model="receiver_phone" type="text" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="+255 700...">
-                                @error('receiver_phone') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Shipment Grid -->
-                    <div class="space-y-6">
-                        <div class="flex items-center gap-2 mb-2">
-                            <div class="w-1.5 h-6 bg-slate-900 rounded-full"></div>
-                            <h4 class="text-[10px] font-black uppercase text-slate-900 tracking-widest">Shipment Info</h4>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Origin (From)</label>
-                                <div wire:ignore>
-                                    <select x-ref="originSelect" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
-                                        <option value=""></option>
-                                        @foreach($stations as $station)
-                                            <option value="{{ $station }}" {{ $origin == $station ? 'selected' : '' }}>{{ $station }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                @error('origin') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Destination (To)</label>
-                                <div wire:ignore>
-                                    <select x-ref="destinationSelect" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
-                                        <option value=""></option>
-                                        @foreach($stations as $station)
-                                            <option value="{{ $station }}" {{ $destination == $station ? 'selected' : '' }}>{{ $station }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                @error('destination') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-8">
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Amount (TZS)</label>
-                                <input wire:model="amount" type="number" step="0.01" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
-                                @error('amount') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Status</label>
-                                <select wire:model="status" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
-                                    <option value="pending">Pending</option>
-                                    <option value="in-transit">In Transit</option>
-                                    <option value="delivered">Delivered</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
-                                @error('status') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Description</label>
-                            <textarea wire:model="description" rows="3" class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900 placeholder:text-slate-300" placeholder="Describe the parcel content..."></textarea>
-                            @error('description') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-
-                    <div class="pt-6 flex gap-4">
-                        <button type="button" @click="showModal = false; $wire.cancelEdit()" class="flex-1 px-8 py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border border-slate-200">
-                            Discard
-                        </button>
-                        <button type="submit" class="flex-[2] px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all shadow-2xl shadow-slate-900/20 flex items-center justify-center gap-3">
-                            <span wire:loading.remove wire:target="saveParcel">{{ $editingParcelId ? 'Update Information' : 'Confirm Registration' }}</span>
-                            <div wire:loading wire:target="saveParcel" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                            <svg wire:loading.remove wire:target="saveParcel" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    @endif
 
     <!-- QR Code Preview Modal -->
     <div x-show="showQrModal" 
@@ -440,10 +429,10 @@
                             Close Details
                         </button>
                         <div class="flex gap-2">
-                           <button @click="showDetails = false; $wire.editParcel({{ $viewingParcel->id }})" class="px-6 py-4 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                           <a href="{{ route('dashboard', ['view' => 'parcels', 'action' => 'edit', 'id' => $viewingParcel->id]) }}" @click="showDetails = false" class="px-6 py-4 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                 Edit Parcel
-                           </button>
+                           </a>
                         </div>
                     </div>
                 </div>

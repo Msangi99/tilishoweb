@@ -31,6 +31,10 @@ class ParcelManagement extends Component
     public $viewingParcel = null;
     public $showDetailsModal = false;
 
+    /** 'create' | 'edit' | null (list) - from URL query for dedicated pages */
+    public $action = null;
+    public $parcelId = null;
+
     public $editingParcelId;
     public $sender_name;
     public $sender_phone;
@@ -40,6 +44,15 @@ class ParcelManagement extends Component
     public $destination;
     public $amount;
     public $description;
+
+    public function mount()
+    {
+        $this->action = request()->query('action');
+        $this->parcelId = request()->query('id');
+        if ($this->action === 'edit' && $this->parcelId) {
+            $this->editParcel((int) $this->parcelId);
+        }
+    }
 
     public function rules()
     {
@@ -96,7 +109,7 @@ class ParcelManagement extends Component
     {
         $this->editingParcelId = $id;
         $parcel = Parcel::findOrFail($id);
-        
+
         $this->sender_name = $parcel->sender_name;
         $this->sender_phone = $parcel->sender_phone;
         $this->receiver_name = $parcel->receiver_name;
@@ -106,8 +119,6 @@ class ParcelManagement extends Component
         $this->amount = $parcel->amount;
         $this->description = $parcel->description;
         $this->status = $parcel->status;
-
-        $this->dispatch('open-parcel-modal');
     }
 
     public function cancelEdit()
@@ -151,7 +162,7 @@ class ParcelManagement extends Component
         }
 
         $this->cancelEdit();
-        $this->dispatch('parcel-saved');
+        return $this->redirect(route('dashboard', ['view' => 'parcels']), navigate: true);
     }
 
     public function deleteParcel($id)

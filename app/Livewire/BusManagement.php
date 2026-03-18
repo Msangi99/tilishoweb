@@ -12,6 +12,9 @@ class BusManagement extends Component
 {
     use WithPagination;
 
+    /** When false, show create form first (default). When true, show list of buses. */
+    public $showList = false;
+
     public $search = '';
     public $perPage = 10;
     
@@ -54,6 +57,7 @@ class BusManagement extends Component
 
     public function editBus($id)
     {
+        $this->showList = false;
         $this->cancelEdit();
         $this->editingBusId = $id;
         $bus = Bus::findOrFail($id);
@@ -72,6 +76,18 @@ class BusManagement extends Component
     {
         $this->reset(['editingBusId', 'plate_number', 'status', 'route_id', 'drivers', 'conductors', 'attendants']);
         $this->resetErrorBag();
+    }
+
+    public function showBusList()
+    {
+        $this->showList = true;
+        $this->cancelEdit();
+    }
+
+    public function showCreateForm()
+    {
+        $this->showList = false;
+        $this->cancelEdit();
     }
 
     public function saveBus()

@@ -4,13 +4,21 @@
             <h2 class="text-2xl font-bold text-slate-900 font-inter">Manage Fleet</h2>
             <p class="text-sm text-slate-500">Configure buses, routes, and assigned crew members.</p>
         </div>
-        <button wire:click="cancelEdit" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
+        @if($showList)
+        <button wire:click="showCreateForm" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bus"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M8 15h.01"/><path d="M16 15h.01"/><path d="M6 19v2"/><path d="M18 19v2"/></svg>
-            {{ $editingBusId ? 'Cancel Edit' : 'Add New Bus' }}
+            Add New Bus
         </button>
+        @else
+        <button wire:click="showBusList" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+            List Buses
+        </button>
+        @endif
     </div>
 
-    <!-- Inline Create/Edit Form (centered, 80% width max) -->
+    @if(!$showList)
+    <!-- Create/Edit Form (shown first by default) -->
     <div class="w-full flex justify-center mb-6">
         <div class="w-[80%] max-w-4xl bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
@@ -130,8 +138,10 @@
             </div>
         </div>
     </div>
+    @endif
 
-    <!-- DataTable Inspired Container -->
+    @if($showList)
+    <!-- List of Buses -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <!-- DataTable Header Controls -->
         <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/30">
@@ -235,6 +245,7 @@
             {{ $buses->links() }}
         </div>
     </div>
+    @endif
 
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }

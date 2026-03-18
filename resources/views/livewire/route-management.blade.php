@@ -4,13 +4,21 @@
             <h2 class="text-2xl font-bold text-slate-900 font-inter">Manage Routes</h2>
             <p class="text-sm text-slate-500">Define and manage bus routes and their stations.</p>
         </div>
-        <button wire:click="cancelEdit" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
+        @if($showList)
+        <button wire:click="showCreateForm" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-            {{ $editingRouteId ? 'Cancel Edit' : 'Add New Route' }}
+            Add New Route
         </button>
+        @else
+        <button wire:click="showRouteList" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+            List Routes
+        </button>
+        @endif
     </div>
 
-    <!-- Inline Create/Edit Form (centered, 80% width max) -->
+    @if(!$showList)
+    <!-- Create/Edit Form (shown first by default) -->
     <div class="w-full mx-auto flex justify-center">
         <div class="w-[80%] max-w-4xl">
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -68,8 +76,10 @@
             </div>
         </div>
     </div>
+    @endif
 
-    <!-- DataTable Inspired Container -->
+    @if($showList)
+    <!-- List of Routes -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <!-- DataTable Header Controls -->
         <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/30">
@@ -167,6 +177,9 @@
                 {{ $routes->links() }}
             </div>
         </div>
+    </div>
+    @endif
+
     <!-- Custom Pagination & Scrollbar Styling -->
     <style>
         .pagination { display: flex; gap: 0.25rem; }

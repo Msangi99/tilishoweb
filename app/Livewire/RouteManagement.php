@@ -10,6 +10,9 @@ class RouteManagement extends Component
 {
     use WithPagination;
 
+    /** When false, show create form first (default). When true, show list of routes. */
+    public $showList = false;
+
     public $search = '';
     public $perPage = 10;
     
@@ -68,6 +71,7 @@ class RouteManagement extends Component
 
     public function editRoute($id)
     {
+        $this->showList = false;
         $this->editingRouteId = $id;
         $route = BusRoute::findOrFail($id);
         
@@ -82,6 +86,18 @@ class RouteManagement extends Component
     {
         $this->reset(['editingRouteId', 'from', 'to', 'stations']);
         $this->resetErrorBag();
+    }
+
+    public function showRouteList()
+    {
+        $this->showList = true;
+        $this->cancelEdit();
+    }
+
+    public function showCreateForm()
+    {
+        $this->showList = false;
+        $this->cancelEdit();
     }
 
     public function saveRoute()
