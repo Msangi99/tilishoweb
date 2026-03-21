@@ -1,12 +1,24 @@
 <x-layouts.admin>
-    <div class="flex min-h-screen bg-slate-50">
+    <div class="flex min-h-screen bg-slate-50" x-data="{ sidebarOpen: false }" x-on:livewire:navigated.window="sidebarOpen = false" @keydown.window.escape="sidebarOpen = false">
         <!-- Sidebar -->
         <aside 
             id="sidebar"
-            class="fixed inset-y-0 left-0 z-30 w-64 bg-[#1a2234] text-slate-300 flex-shrink-0 flex flex-col shadow-xl"
+            class="fixed inset-y-0 left-0 z-40 w-64 bg-[#1a2234] text-slate-300 flex-shrink-0 flex flex-col shadow-xl transform transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0"
+            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
         >
             <!-- Sidebar Header -->
-            <div class="p-8 flex flex-col items-center gap-4">
+            <div class="p-8 flex flex-col items-center gap-4 relative">
+                <button
+                    type="button"
+                    class="md:hidden absolute right-3 top-3 inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-white/10"
+                    @click="sidebarOpen = false"
+                    aria-label="Close sidebar"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
                 <div class="w-full h-16 flex items-center justify-center p-2 bg-white/5 rounded-xl border border-white/10 overflow-hidden">
                     <img src="{{ asset('asset/logo.webp') }}" alt="Tilisho Logo" class="max-h-full max-w-full object-contain filter brightness-125">
                 </div>
@@ -15,12 +27,14 @@
             <!-- Navigation -->
             <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
                 <a href="{{ route('dashboard') }}" 
+                   @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-4 py-3 {{ request()->query('view') == 'dashboard' || !request()->query('view') ? 'bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white rounded-xl transition-all group' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard {{ request()->query('view') == 'dashboard' || !request()->query('view') ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
                     <span class="text-sm">Summary</span>
                 </a>
                 
                 <a href="{{ route('dashboard', ['view' => 'parcels']) }}" 
+                   @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-4 py-3 {{ request()->query('view') == 'parcels' ? 'bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white rounded-xl transition-all group' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package {{ request()->query('view') == 'parcels' ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
                     <span class="text-sm">Manage Parcels</span>
@@ -28,24 +42,28 @@
                 
                 @if(Auth::user()->role == 'admin')
                 <a href="{{ route('dashboard', ['view' => 'users']) }}" 
+                   @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-4 py-3 {{ request()->query('view') == 'users' ? 'bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white rounded-xl transition-all group' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users {{ request()->query('view') == 'users' ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     <span class="text-sm">User Management</span>
                 </a>
 
                 <a href="{{ route('dashboard', ['view' => 'buses']) }}" 
+                   @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-4 py-3 {{ request()->query('view') == 'buses' ? 'bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white rounded-xl transition-all group' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bus {{ request()->query('view') == 'buses' ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M8 15h.01"/><path d="M16 15h.01"/><path d="M6 19v2"/><path d="M18 19v2"/></svg>
                     <span class="text-sm">Manage Buses</span>
                 </a>
 
                 <a href="{{ route('dashboard', ['view' => 'routes']) }}" 
+                   @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-4 py-3 {{ request()->query('view') == 'routes' ? 'bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white rounded-xl transition-all group' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin {{ request()->query('view') == 'routes' ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                     <span class="text-sm">Manage Routes</span>
                 </a>
 
                 <a href="{{ route('dashboard', ['view' => 'settings']) }}" 
+                   @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-4 py-3 {{ request()->query('view') == 'settings' ? 'bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white rounded-xl transition-all group' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings {{ request()->query('view') == 'settings' ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                     <span class="text-sm">Settings</span>
@@ -54,20 +72,38 @@
             </nav>
         </aside>
 
+        <div
+            x-show="sidebarOpen"
+            @click="sidebarOpen = false"
+            x-transition.opacity
+            class="fixed inset-0 z-30 bg-slate-900/50 md:hidden"
+            x-cloak
+        ></div>
+
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col relative z-10 bg-slate-50 ml-64">
+        <main class="flex-1 flex flex-col relative z-10 bg-slate-50 ml-0 md:ml-64">
             <!-- Top Header -->
             <header class="h-20 bg-white/80 backdrop-blur-md border-b flex items-center justify-between px-4 md:px-10 sticky top-0 z-10">
                 <div class="flex items-center gap-3">
-                    <!-- Mobile menu button -->
-                    <!-- (Optional) mobile menu button removed to avoid JS issues -->
+                    <button
+                        type="button"
+                        class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        @click="sidebarOpen = !sidebarOpen"
+                        aria-label="Toggle sidebar"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
                     <div class="flex flex-col">
                     <h1 class="text-xl font-bold text-slate-900">System Dashboard</h1>
                     <p class="text-[11px] text-slate-500 font-medium">Welcome back to the management portal</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-6">
-                    <div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-full text-[11px] font-bold text-slate-600 border border-slate-200">
+                <div class="flex items-center gap-3 md:gap-6">
+                    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-full text-[11px] font-bold text-slate-600 border border-slate-200">
                         <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                         LIVE STATUS
                     </div>
@@ -75,7 +111,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
                         <span class="absolute top-2 right-2 w-2 h-2 bg-blue-600 rounded-full border-2 border-white"></span>
                     </button>
-                    <div class="h-8 w-px bg-slate-200"></div>
+                    <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
                     
                     <!-- User Dropdown -->
                     <div class="relative" x-data="{ open: false }" @click.away="open = false">
@@ -122,7 +158,7 @@
             </header>
 
             <!-- Dashboard Content -->
-            <div class="flex-1 overflow-y-scroll p-10">
+            <div class="flex-1 overflow-y-scroll p-4 sm:p-6 md:p-10">
                 @if(request()->query('view') == 'users')
                     <livewire:user-management />
                 @elseif(request()->query('view') == 'parcels')
