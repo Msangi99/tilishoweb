@@ -38,7 +38,10 @@ class Wallet extends Model
     }
 
     /**
-     * Apply parcel fee split to wallet ($direction 1 = credit on create, -1 = reverse on delete).
+     * Credit wallets from a parcel: system gets the full parcel amount; TRA and developer get their
+     * percentage shares in parallel (not deducted from the system bucket).
+     *
+     * @param  int  $direction  1 = credit on create, -1 = reverse on delete
      */
     public static function adjustForParcelAmount(float $amount, int $direction = 1): void
     {
@@ -50,7 +53,7 @@ class Wallet extends Model
         $devPct = (float) SystemSetting::getValue('fee_developer_percent', '3');
         $traPart = round($amount * ($traPct / 100), 2);
         $devPart = round($amount * ($devPct / 100), 2);
-        $sysPart = round($amount - $traPart - $devPart, 2);
+        $sysPart = round($amount, 2);
 
         $delta = $direction;
 

@@ -80,7 +80,7 @@
             </div>
             <h3 class="text-sm font-bold text-slate-500 mb-1">System wallet</h3>
             <p class="text-3xl font-black text-slate-900">TZS {{ number_format((float) $wallet->system, 0) }}</p>
-            <p class="text-xs text-slate-500 mt-2">Remaining parcel share after TRA &amp; developer splits (all time).</p>
+            <p class="text-xs text-slate-500 mt-2">Sum of all parcel amounts (full gross). TRA &amp; developer wallets track their % shares separately.</p>
         </div>
 
         <button

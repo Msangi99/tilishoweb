@@ -1,21 +1,18 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * System wallet should equal total parcel gross; TRA/developer remain % accruals minus withdrawals.
+     */
     public function up(): void
     {
-        Schema::create('wallets', function (Blueprint $table) {
-            $table->id();
-            $table->decimal('system', 14, 2)->default(0);
-            $table->decimal('tra', 14, 2)->default(0);
-            $table->decimal('developer', 14, 2)->default(0);
-            $table->timestamps();
-        });
+        if (! DB::getSchemaBuilder()->hasTable('wallets')) {
+            return;
+        }
 
         $setting = fn (string $key, string $default): float => (float) (DB::table('system_settings')->where('key', $key)->value('value') ?? $default);
 
@@ -30,17 +27,16 @@ return new class extends Migration
         $traWithdrawn = (float) (DB::table('fee_withdrawals')->where('type', 'tra')->sum('amount') ?? 0);
         $developerWithdrawn = (float) (DB::table('fee_withdrawals')->where('type', 'developer')->sum('amount') ?? 0);
 
-        DB::table('wallets')->insert([
+        DB::table('wallets')->update([
             'system' => max(0, $systemAccrued),
             'tra' => max(0, round($traAccrued - $traWithdrawn, 2)),
             'developer' => max(0, round($developerAccrued - $developerWithdrawn, 2)),
-            'created_at' => now(),
             'updated_at' => now(),
         ]);
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('wallets');
+        // Cannot reliably restore previous split-based system balance.
     }
 };
