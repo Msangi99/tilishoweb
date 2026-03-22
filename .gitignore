@@ -1,2 +1,7 @@
 .env
+
+# SQLite (local only — never push)
 database/database.sqlite
+database/*.sqlite-journal
+database/*.sqlite-wal
+database/*.sqlite-shm
