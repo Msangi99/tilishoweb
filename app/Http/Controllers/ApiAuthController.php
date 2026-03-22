@@ -134,6 +134,8 @@ class ApiAuthController extends Controller
 
     /**
      * Confirm the current user's password (e.g. before sensitive actions).
+     * Compares against the hashed password stored for this user in the app
+     * database (e.g. SQLite `database/database.sqlite` when using sqlite).
      */
     public function verifyPassword(Request $request)
     {

@@ -31,11 +31,13 @@ class Parcel extends Model
         'end_travel_time',
         'transported_by_id',
         'transported_by_name',
+        'transported_by_phone',
         'transported_bus_id',
         'transported_route',
         'transported_at',
         'received_by_id',
         'received_by_name',
+        'received_by_phone',
         'received_at',
     ];
 

@@ -210,6 +210,7 @@ class ApiParcelController extends Controller
         $parcel->update([
             'transported_by_id' => $user->id,
             'transported_by_name' => $displayName,
+            'transported_by_phone' => $user->phone,
             'transported_bus_id' => $bus->id,
             'transported_route' => $routeName,
             'transported_at' => now(),
@@ -247,6 +248,7 @@ class ApiParcelController extends Controller
         $parcel->update([
             'received_by_id' => $user->id,
             'received_by_name' => $user->name,
+            'received_by_phone' => $user->phone,
             'received_at' => now(),
             'status' => 'received',
         ]);

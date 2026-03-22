@@ -651,11 +651,17 @@
                                             @if($viewingParcel->transported_by_name)
                                                 <span class="text-[10px] font-semibold text-slate-500">
                                                     Given to: {{ $viewingParcel->transported_by_name }}
+                                                    @if($viewingParcel->transported_by_phone)
+                                                        · {{ $viewingParcel->transported_by_phone }}
+                                                    @endif
                                                 </span>
                                             @endif
                                             @if($viewingParcel->received_by_name)
                                                 <span class="text-[10px] font-semibold text-emerald-600">
                                                     Received by: {{ $viewingParcel->received_by_name }}
+                                                    @if($viewingParcel->received_by_phone)
+                                                        · {{ $viewingParcel->received_by_phone }}
+                                                    @endif
                                                 </span>
                                             @endif
                                         </div>
