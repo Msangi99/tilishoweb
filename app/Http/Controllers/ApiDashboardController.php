@@ -14,7 +14,7 @@ class ApiDashboardController extends Controller
      * Return dashboard statistics for the mobile app and admin web dashboard.
      *
      * Optional query (web): period=day|week|month|year, year=YYYY, month=1-12
-     * When present, adds filter, filtered_chart, and filtered_recent_parcels.
+     * When present, adds filter, filtered_chart, and filtered_period_parcels (with TRA / dev / remain).
      */
     public function stats(Request $request)
     {
@@ -105,19 +105,25 @@ class ApiDashboardController extends Controller
             $filterCount = Parcel::whereBetween('created_at', [$fStart, $fEnd])->count();
             $filterAmount = Parcel::whereBetween('created_at', [$fStart, $fEnd])->sum('amount');
 
+            $traPct = (float) SystemSetting::getValue('fee_tra_percent', '18');
+            $devPct = (float) SystemSetting::getValue('fee_developer_percent', '3');
+
             $data['filter'] = [
                 'period' => $period,
                 'label' => $fLabel,
                 'count' => $filterCount,
                 'amount' => $filterAmount,
+                'tra_percent' => $traPct,
+                'developer_percent' => $devPct,
             ];
             $data['filtered_chart'] = $this->buildFilteredChart($fStart, $fEnd, (string) $period);
-            $data['filtered_recent_parcels'] = Parcel::with(['createdBy', 'transportedBy', 'receivedBy'])
+            $data['filtered_period_parcels'] = Parcel::with(['createdBy', 'transportedBy', 'receivedBy'])
                 ->whereBetween('created_at', [$fStart, $fEnd])
                 ->orderByDesc('created_at')
-                ->limit(50)
                 ->get()
-                ->map(fn (Parcel $p) => $this->parcelToSummary($p));
+                ->map(fn (Parcel $p) => $this->parcelToPeriodRow($p, $traPct, $devPct))
+                ->values()
+                ->all();
         }
 
         return response()->json([

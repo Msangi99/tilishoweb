@@ -1,30 +1,4 @@
 <x-layouts.admin>
-    @push('styles')
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
-        <style>
-            #admin-period-parcels-dt_wrapper .dataTables_filter input {
-                border-radius: 0.5rem;
-                border: 1px solid #e2e8f0;
-                padding: 0.35rem 0.65rem;
-                margin-left: 0.5rem;
-            }
-            #admin-period-parcels-dt_wrapper .dataTables_length select {
-                border-radius: 0.5rem;
-                border: 1px solid #e2e8f0;
-                padding: 0.25rem 0.5rem;
-            }
-            table.dataTable thead th {
-                font-size: 0.65rem;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: 0.08em;
-                color: #94a3b8;
-            }
-        </style>
-    @endpush
-    @push('scripts')
-        <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-    @endpush
     <div class="flex min-h-screen bg-slate-50" x-data="{ sidebarOpen: false }" x-on:livewire:navigated.window="sidebarOpen = false" @keydown.window.escape="sidebarOpen = false">
         <!-- Sidebar -->
         <aside 
@@ -361,33 +335,69 @@
                             </div>
                         </div>
 
-                        <!-- Parcels in period: jQuery DataTables -->
-                        <div class="bg-white rounded-3xl border shadow-sm overflow-hidden" x-show="stats?.filter" x-cloak>
-                            <div class="p-6 border-b border-slate-100 space-y-1">
-                                <h2 class="text-sm font-bold text-slate-900">Parcels in selected period</h2>
-                                <p class="text-xs text-slate-500">
-                                    Fee splits from settings:
-                                    TRA <span class="font-bold text-slate-700" x-text="stats?.filter?.tra_percent ?? '—'"></span>%
-                                    · Developer <span class="font-bold text-slate-700" x-text="stats?.filter?.developer_percent ?? '—'"></span>%.
-                                    <span class="text-slate-400">Remain = Amount − TRA − Dev.</span>
-                                </p>
+                        <!-- Parcels in period (Alpine; data from filtered_period_parcels API) -->
+                        <div class="bg-white rounded-3xl border shadow-sm overflow-hidden" x-show="stats && stats.filter" x-cloak>
+                            <div class="p-6 border-b border-slate-100 space-y-3">
+                                <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                                    <div class="space-y-1">
+                                        <h2 class="text-sm font-bold text-slate-900">Parcels in selected period</h2>
+                                        <p class="text-xs text-slate-500">
+                                            Fee splits from settings:
+                                            TRA <span class="font-bold text-slate-700" x-text="stats.filter.tra_percent ?? '—'"></span>%
+                                            · Developer <span class="font-bold text-slate-700" x-text="stats.filter.developer_percent ?? '—'"></span>%.
+                                            <span class="text-slate-400">Remain = Amount − TRA − Dev.</span>
+                                        </p>
+                                    </div>
+                                    <input
+                                        type="search"
+                                        x-model="periodSearch"
+                                        placeholder="Search table…"
+                                        class="w-full sm:w-64 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                                    />
+                                </div>
                             </div>
-                            <div class="p-4 overflow-x-auto">
-                                <table id="admin-period-parcels-dt" class="display stripe hover cell-border w-full text-sm" style="width:100%">
-                                    <thead>
+                            <div class="overflow-x-auto max-h-[min(70vh,520px)] overflow-y-auto">
+                                <table class="min-w-full text-left text-sm">
+                                    <thead class="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
                                         <tr>
-                                            <th>Tracking</th>
-                                            <th>Route</th>
-                                            <th class="text-right">Amount</th>
-                                            <th class="text-right">TRA</th>
-                                            <th class="text-right">Dev</th>
-                                            <th class="text-right">Remain</th>
-                                            <th>Status</th>
-                                            <th>Created</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Tracking</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Route</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400 text-right">Amount</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400 text-right">TRA</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400 text-right">Dev</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400 text-right">Remain</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Status</th>
+                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Created</th>
                                         </tr>
                                     </thead>
-                                    <tbody></tbody>
+                                    <tbody class="divide-y divide-slate-100">
+                                        <template x-for="item in periodParcelsRows" :key="item.id">
+                                            <tr class="hover:bg-slate-50/80">
+                                                <td class="px-4 py-2 font-mono text-xs text-slate-800" x-text="item.tracking_number"></td>
+                                                <td class="px-4 py-2 text-xs text-slate-700">
+                                                    <span x-text="item.origin"></span>
+                                                    <span class="text-slate-400"> → </span>
+                                                    <span x-text="item.destination"></span>
+                                                </td>
+                                                <td class="px-4 py-2 text-xs font-semibold text-emerald-700 text-right" x-text="formatCurrency(item.amount)"></td>
+                                                <td class="px-4 py-2 text-xs text-amber-900 text-right" x-text="formatCurrency(item.tra_amount)"></td>
+                                                <td class="px-4 py-2 text-xs text-violet-900 text-right" x-text="formatCurrency(item.developer_amount)"></td>
+                                                <td class="px-4 py-2 text-xs font-bold text-slate-900 text-right" x-text="formatCurrency(item.remain_amount)"></td>
+                                                <td class="px-4 py-2">
+                                                    <span
+                                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest"
+                                                        :class="statusClass(item.status)"
+                                                        x-text="item.status"
+                                                    ></span>
+                                                </td>
+                                                <td class="px-4 py-2 text-[11px] text-slate-500 whitespace-nowrap" x-text="item.created_at"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
                                 </table>
+                                <p class="px-4 py-8 text-center text-xs text-slate-400" x-show="stats && stats.filter && periodParcelsRows.length === 0">
+                                    No parcels match this period or search.
+                                </p>
                             </div>
                         </div>
 
@@ -407,6 +417,7 @@
                             return {
                                 stats: null,
                                 loading: false,
+                                periodSearch: '',
                                 period: 'month',
                                 calendarYear: now.getFullYear(),
                                 calendarMonth: now.getMonth() + 1,
@@ -443,6 +454,34 @@
                                     }
                                     return 'Parcels (last 7 days)';
                                 },
+                                get periodParcelsRows() {
+                                    if (!this.stats || !this.stats.filtered_period_parcels) {
+                                        return [];
+                                    }
+                                    const raw = this.stats.filtered_period_parcels;
+                                    const list = Array.isArray(raw) ? raw : [];
+                                    const q = (this.periodSearch || '').trim().toLowerCase();
+                                    if (!q) {
+                                        return list;
+                                    }
+                                    return list.filter((p) => {
+                                        const parts = [
+                                            p.tracking_number,
+                                            p.origin,
+                                            p.destination,
+                                            p.sender_name,
+                                            p.receiver_name,
+                                            p.status,
+                                            p.created_by,
+                                            p.created_at,
+                                            String(p.amount),
+                                            String(p.tra_amount),
+                                            String(p.developer_amount),
+                                            String(p.remain_amount),
+                                        ];
+                                        return parts.some((x) => String(x || '').toLowerCase().includes(q));
+                                    });
+                                },
                                 monthName(m) {
                                     return new Date(2000, m - 1, 1).toLocaleString('en', { month: 'long' });
                                 },
@@ -470,94 +509,7 @@
                                         console.error('Failed to load dashboard stats', e);
                                     } finally {
                                         this.loading = false;
-                                        // Defer until Alpine has toggled x-show (DataTables needs visible layout)
-                                        setTimeout(() => this.syncPeriodParcelsDataTable(), 100);
                                     }
-                                },
-                                syncPeriodParcelsDataTable() {
-                                    const $ = window.jQuery;
-                                    if (!$ || !$.fn.DataTable) {
-                                        return;
-                                    }
-                                    const el = document.getElementById('admin-period-parcels-dt');
-                                    if (!el) {
-                                        return;
-                                    }
-                                    if (!this.stats || !this.stats.filter) {
-                                        return;
-                                    }
-                                    let rows = this.stats.filtered_period_parcels || [];
-                                    if (!Array.isArray(rows)) {
-                                        rows = [];
-                                    }
-                                    if ($.fn.DataTable.isDataTable(el)) {
-                                        $(el).DataTable().destroy();
-                                        $(el).find('tbody').empty();
-                                    }
-                                    const fmt = (n) => {
-                                        const num = Number(n) || 0;
-                                        return 'TZS ' + num.toLocaleString('en-TZ', { maximumFractionDigits: 0 });
-                                    };
-                                    const esc = (s) => {
-                                        if (s === null || s === undefined) {
-                                            return '';
-                                        }
-                                        return String(s)
-                                            .replace(/&/g, '&amp;')
-                                            .replace(/</g, '&lt;')
-                                            .replace(/>/g, '&gt;')
-                                            .replace(/"/g, '&quot;');
-                                    };
-                                    const badgeClass = (status) => this.statusClass(status);
-                                    const api = $(el).DataTable({
-                                        data: rows,
-                                        columns: [
-                                            { data: 'tracking_number', className: 'font-mono text-xs', render: (d) => esc(d) },
-                                            {
-                                                data: null,
-                                                render: (row) => esc(row.origin || '') + ' → ' + esc(row.destination || ''),
-                                            },
-                                            {
-                                                data: 'amount',
-                                                className: 'text-right font-semibold text-emerald-800',
-                                                render: (d) => fmt(d),
-                                            },
-                                            {
-                                                data: 'tra_amount',
-                                                className: 'text-right text-amber-900',
-                                                render: (d) => fmt(d),
-                                            },
-                                            {
-                                                data: 'developer_amount',
-                                                className: 'text-right text-violet-900',
-                                                render: (d) => fmt(d),
-                                            },
-                                            {
-                                                data: 'remain_amount',
-                                                className: 'text-right font-bold text-slate-900',
-                                                render: (d) => fmt(d),
-                                            },
-                                            {
-                                                data: 'status',
-                                                render: (d) => {
-                                                    const c = badgeClass(d);
-                                                    return '<span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ' + c + '">' + esc(d) + '</span>';
-                                                },
-                                            },
-                                            { data: 'created_at', render: (d) => esc(d) },
-                                        ],
-                                        order: [[7, 'desc']],
-                                        pageLength: 25,
-                                        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']],
-                                        scrollX: true,
-                                        language: {
-                                            emptyTable: 'No parcels in this period.',
-                                            zeroRecords: 'No matching parcels.',
-                                        },
-                                    });
-                                    try {
-                                        api.columns.adjust().draw(false);
-                                    } catch (e) { /* ignore */ }
                                 },
                                 formatCurrency(value) {
                                     if (value === null || value === undefined) return 'TZS 0';
