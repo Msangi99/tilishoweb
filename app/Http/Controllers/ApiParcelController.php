@@ -86,8 +86,10 @@ class ApiParcelController extends Controller
             'creator_office' => 'required|string|max:255',
             'sender_name' => 'required|string|max:255',
             'sender_phone' => 'required|string|max:20',
+            'sender_email' => 'nullable|string|email|max:255',
             'receiver_name' => 'required|string|max:255',
             'receiver_phone' => 'required|string|max:20',
+            'receiver_email' => 'nullable|string|email|max:255',
             'origin' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
@@ -106,8 +108,14 @@ class ApiParcelController extends Controller
             'creator_office' => $validated['creator_office'],
             'sender_name' => $validated['sender_name'],
             'sender_phone' => $validated['sender_phone'],
+            'sender_email' => isset($validated['sender_email']) && trim((string) $validated['sender_email']) !== ''
+                ? trim($validated['sender_email'])
+                : null,
             'receiver_name' => $validated['receiver_name'],
             'receiver_phone' => $validated['receiver_phone'],
+            'receiver_email' => isset($validated['receiver_email']) && trim((string) $validated['receiver_email']) !== ''
+                ? trim($validated['receiver_email'])
+                : null,
             'origin' => $validated['origin'],
             'destination' => $validated['destination'],
             'amount' => $validated['amount'],

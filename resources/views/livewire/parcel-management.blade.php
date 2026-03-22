@@ -71,6 +71,16 @@
                                     @error('sender_phone') <span
                                     class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                                 </div>
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Email
+                                        <span class="font-semibold normal-case text-slate-400">(optional)</span></label>
+                                    <input wire:model="sender_email" type="email"
+                                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        placeholder="sender@example.com">
+                                    @error('sender_email') <span
+                                    class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                                </div>
                             </div>
                             <div class="space-y-6">
                                 <div class="flex items-center gap-2 mb-2">
@@ -95,6 +105,16 @@
                                         class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                         placeholder="+255 700...">
                                     @error('receiver_phone') <span
+                                    class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Email
+                                        <span class="font-semibold normal-case text-slate-400">(optional)</span></label>
+                                    <input wire:model="receiver_email" type="email"
+                                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        placeholder="receiver@example.com">
+                                    @error('receiver_email') <span
                                     class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -582,11 +602,17 @@
                                         <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Sender</p>
                                         <p class="text-sm font-semibold text-slate-900">{{ $viewingParcel->sender_name }}</p>
                                         <p class="text-xs font-mono text-slate-600">{{ $viewingParcel->sender_phone }}</p>
+                                        @if($viewingParcel->sender_email)
+                                            <p class="text-xs text-slate-600 break-all">{{ $viewingParcel->sender_email }}</p>
+                                        @endif
                                     </div>
                                     <div class="space-y-2">
                                         <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Receiver</p>
                                         <p class="text-sm font-semibold text-slate-900">{{ $viewingParcel->receiver_name }}</p>
                                         <p class="text-xs font-mono text-slate-600">{{ $viewingParcel->receiver_phone }}</p>
+                                        @if($viewingParcel->receiver_email)
+                                            <p class="text-xs text-slate-600 break-all">{{ $viewingParcel->receiver_email }}</p>
+                                        @endif
                                     </div>
                                     <div class="space-y-2">
                                         <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">

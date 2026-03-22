@@ -40,8 +40,10 @@ class ParcelManagement extends Component
     public $editingParcelId;
     public $sender_name;
     public $sender_phone;
+    public $sender_email;
     public $receiver_name;
     public $receiver_phone;
+    public $receiver_email;
     public $origin;
     public $destination;
     public $amount;
@@ -81,8 +83,10 @@ class ParcelManagement extends Component
             'creator_office' => 'required|string|max:255',
             'sender_name' => 'required|string|max:255',
             'sender_phone' => 'required|string|max:20',
+            'sender_email' => 'nullable|string|email|max:255',
             'receiver_name' => 'required|string|max:255',
             'receiver_phone' => 'required|string|max:20',
+            'receiver_email' => 'nullable|string|email|max:255',
             'origin' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
@@ -135,8 +139,10 @@ class ParcelManagement extends Component
 
         $this->sender_name = $parcel->sender_name;
         $this->sender_phone = $parcel->sender_phone;
+        $this->sender_email = $parcel->sender_email;
         $this->receiver_name = $parcel->receiver_name;
         $this->receiver_phone = $parcel->receiver_phone;
+        $this->receiver_email = $parcel->receiver_email;
         $this->origin = $parcel->origin;
         $this->destination = $parcel->destination;
         $this->parcel_name = $parcel->parcel_name;
@@ -152,7 +158,7 @@ class ParcelManagement extends Component
 
     public function cancelEdit()
     {
-        $this->reset(['editingParcelId', 'sender_name', 'sender_phone', 'receiver_name', 'receiver_phone', 'origin', 'destination', 'amount', 'description', 'status', 'bus_id', 'travel_date', 'parcel_name', 'creator_office']);
+        $this->reset(['editingParcelId', 'sender_name', 'sender_phone', 'sender_email', 'receiver_name', 'receiver_phone', 'receiver_email', 'origin', 'destination', 'amount', 'description', 'status', 'bus_id', 'travel_date', 'parcel_name', 'creator_office']);
         $this->quantity = 1;
         $this->weight_band = 'under_20kg';
         $this->travel_date = now()->format('Y-m-d');
@@ -170,8 +176,10 @@ class ParcelManagement extends Component
             'creator_office' => $this->creator_office,
             'sender_name' => $this->sender_name,
             'sender_phone' => $this->sender_phone,
+            'sender_email' => $this->sender_email,
             'receiver_name' => $this->receiver_name,
             'receiver_phone' => $this->receiver_phone,
+            'receiver_email' => $this->receiver_email,
             'origin' => $this->origin,
             'destination' => $this->destination,
             'amount' => $this->amount,
@@ -205,8 +213,14 @@ class ParcelManagement extends Component
                 'creator_office' => $validated['creator_office'],
                 'sender_name' => $validated['sender_name'],
                 'sender_phone' => $validated['sender_phone'],
+                'sender_email' => isset($validated['sender_email']) && trim((string) $validated['sender_email']) !== ''
+                    ? trim($validated['sender_email'])
+                    : null,
                 'receiver_name' => $validated['receiver_name'],
                 'receiver_phone' => $validated['receiver_phone'],
+                'receiver_email' => isset($validated['receiver_email']) && trim((string) $validated['receiver_email']) !== ''
+                    ? trim($validated['receiver_email'])
+                    : null,
                 'origin' => $validated['origin'],
                 'destination' => $validated['destination'],
                 'amount' => $validated['amount'],
