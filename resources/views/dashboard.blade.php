@@ -1,4 +1,30 @@
 <x-layouts.admin>
+    @push('styles')
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+        <style>
+            #admin-period-parcels-dt_wrapper .dataTables_filter input {
+                border-radius: 0.5rem;
+                border: 1px solid #e2e8f0;
+                padding: 0.35rem 0.65rem;
+                margin-left: 0.5rem;
+            }
+            #admin-period-parcels-dt_wrapper .dataTables_length select {
+                border-radius: 0.5rem;
+                border: 1px solid #e2e8f0;
+                padding: 0.25rem 0.5rem;
+            }
+            table.dataTable thead th {
+                font-size: 0.65rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: #94a3b8;
+            }
+        </style>
+    @endpush
+    @push('scripts')
+        <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    @endpush
     <div class="flex min-h-screen bg-slate-50" x-data="{ sidebarOpen: false }" x-on:livewire:navigated.window="sidebarOpen = false" @keydown.window.escape="sidebarOpen = false">
         <!-- Sidebar -->
         <aside 
@@ -444,7 +470,8 @@
                                         console.error('Failed to load dashboard stats', e);
                                     } finally {
                                         this.loading = false;
-                                        queueMicrotask(() => this.syncPeriodParcelsDataTable());
+                                        // Defer until Alpine has toggled x-show (DataTables needs visible layout)
+                                        setTimeout(() => this.syncPeriodParcelsDataTable(), 100);
                                     }
                                 },
                                 syncPeriodParcelsDataTable() {
@@ -456,9 +483,13 @@
                                     if (!el) {
                                         return;
                                     }
-                                    const rows = (this.stats && this.stats.filtered_period_parcels)
-                                        ? this.stats.filtered_period_parcels
-                                        : [];
+                                    if (!this.stats || !this.stats.filter) {
+                                        return;
+                                    }
+                                    let rows = this.stats.filtered_period_parcels || [];
+                                    if (!Array.isArray(rows)) {
+                                        rows = [];
+                                    }
                                     if ($.fn.DataTable.isDataTable(el)) {
                                         $(el).DataTable().destroy();
                                         $(el).find('tbody').empty();
@@ -478,7 +509,7 @@
                                             .replace(/"/g, '&quot;');
                                     };
                                     const badgeClass = (status) => this.statusClass(status);
-                                    $(el).DataTable({
+                                    const api = $(el).DataTable({
                                         data: rows,
                                         columns: [
                                             { data: 'tracking_number', className: 'font-mono text-xs', render: (d) => esc(d) },
@@ -524,6 +555,9 @@
                                             zeroRecords: 'No matching parcels.',
                                         },
                                     });
+                                    try {
+                                        api.columns.adjust().draw(false);
+                                    } catch (e) { /* ignore */ }
                                 },
                                 formatCurrency(value) {
                                     if (value === null || value === undefined) return 'TZS 0';
@@ -563,30 +597,3 @@
         </main>
     </div>
 </x-layouts.admin>
-
-@push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
-    <style>
-        #admin-period-parcels-dt_wrapper .dataTables_filter input {
-            border-radius: 0.5rem;
-            border: 1px solid #e2e8f0;
-            padding: 0.35rem 0.65rem;
-            margin-left: 0.5rem;
-        }
-        #admin-period-parcels-dt_wrapper .dataTables_length select {
-            border-radius: 0.5rem;
-            border: 1px solid #e2e8f0;
-            padding: 0.25rem 0.5rem;
-        }
-        table.dataTable thead th {
-            font-size: 0.65rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #94a3b8;
-        }
-    </style>
-@endpush
-@push('scripts')
-    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-@endpush
