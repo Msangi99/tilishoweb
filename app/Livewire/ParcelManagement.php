@@ -2,9 +2,10 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\Parcel;
 use App\Models\Bus;
+use App\Models\Parcel;
+use Illuminate\Support\Facades\Validator;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 class ParcelManagement extends Component
@@ -160,28 +161,59 @@ class ParcelManagement extends Component
 
     public function saveParcel()
     {
-        $this->validate();
+        // Explicit array avoids Livewire's checkRuleMatchesProperty + array_key_exists edge cases
+        // when public properties include models (e.g. viewingParcel) alongside form fields.
+        $data = [
+            'parcel_name' => $this->parcel_name,
+            'quantity' => $this->quantity,
+            'weight_band' => $this->weight_band,
+            'creator_office' => $this->creator_office,
+            'sender_name' => $this->sender_name,
+            'sender_phone' => $this->sender_phone,
+            'receiver_name' => $this->receiver_name,
+            'receiver_phone' => $this->receiver_phone,
+            'origin' => $this->origin,
+            'destination' => $this->destination,
+            'amount' => $this->amount,
+            'description' => $this->description,
+            'bus_id' => $this->bus_id,
+            'travel_date' => $this->travel_date,
+        ];
+
+        $validator = Validator::make($data, $this->rules());
+
+        if ($validator->fails()) {
+            $this->resetErrorBag();
+            foreach ($validator->errors()->messages() as $key => $messages) {
+                foreach ($messages as $message) {
+                    $this->addError($key, $message);
+                }
+            }
+
+            return;
+        }
+
+        $validated = $validator->validated();
 
         if ($this->editingParcelId) {
-            // Editing parcels is disabled for safety
             session()->flash('message', 'Editing existing parcels is not allowed.');
         } else {
             Parcel::create([
-                'parcel_name' => $this->parcel_name,
-                'quantity' => $this->quantity,
-                'weight_band' => $this->weight_band,
-                'creator_office' => $this->creator_office,
-                'sender_name' => $this->sender_name,
-                'sender_phone' => $this->sender_phone,
-                'receiver_name' => $this->receiver_name,
-                'receiver_phone' => $this->receiver_phone,
-                'origin' => $this->origin,
-                'destination' => $this->destination,
-                'amount' => $this->amount,
-                'description' => $this->description,
+                'parcel_name' => $validated['parcel_name'],
+                'quantity' => (int) $validated['quantity'],
+                'weight_band' => $validated['weight_band'],
+                'creator_office' => $validated['creator_office'],
+                'sender_name' => $validated['sender_name'],
+                'sender_phone' => $validated['sender_phone'],
+                'receiver_name' => $validated['receiver_name'],
+                'receiver_phone' => $validated['receiver_phone'],
+                'origin' => $validated['origin'],
+                'destination' => $validated['destination'],
+                'amount' => $validated['amount'],
+                'description' => $validated['description'] ?? null,
                 'status' => 'pending',
-                'bus_id' => $this->bus_id,
-                'travel_date' => $this->travel_date,
+                'bus_id' => $validated['bus_id'] ?? null,
+                'travel_date' => $validated['travel_date'] ?? null,
                 'created_by' => auth()->id(),
             ]);
             session()->flash('message', 'Parcel registered successfully.');

@@ -41,6 +41,13 @@
                 </a>
                 
                 @if(Auth::user()->role == 'admin')
+                <a href="{{ route('dashboard', ['view' => 'fees']) }}" 
+                   @click="sidebarOpen = false"
+                   class="flex items-center gap-3 px-4 py-3 {{ request()->query('view') == 'fees' ? 'bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white rounded-xl transition-all group' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet {{ request()->query('view') == 'fees' ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+                    <span class="text-sm">TRA &amp; developer fees</span>
+                </a>
+
                 <a href="{{ route('dashboard', ['view' => 'users']) }}" 
                    @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-4 py-3 {{ request()->query('view') == 'users' ? 'bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white rounded-xl transition-all group' }}">
@@ -169,6 +176,8 @@
                     <livewire:route-management />
                 @elseif(request()->query('view') == 'settings' && Auth::user()->role == 'admin')
                     <livewire:system-settings />
+                @elseif(request()->query('view') == 'fees' && Auth::user()->role == 'admin')
+                    <livewire:fee-transactions />
                 @elseif(request()->query('view') == 'profile')
                     <livewire:user-profile />
                 @elseif(request()->query('view') == 'scan')
@@ -181,95 +190,93 @@
                         x-init="loadStats()"
                         class="space-y-10"
                     >
+                        <!-- Period filter -->
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Dashboard period</p>
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="opt in periodOptions" :key="opt.key">
+                                    <button
+                                        type="button"
+                                        @click="setPeriod(opt.key)"
+                                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all border"
+                                        :class="period === opt.key ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'"
+                                        x-text="opt.label"
+                                    ></button>
+                                </template>
+                            </div>
+                            <div class="flex flex-wrap gap-4" x-show="period === 'month'" x-cloak>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase">Month</label>
+                                    <select x-model.number="calendarMonth" @change="loadStats()" class="rounded-xl border-slate-200 text-sm font-semibold text-slate-800 min-w-[160px]">
+                                        <template x-for="m in monthOptions" :key="m">
+                                            <option :value="m" x-text="monthName(m)"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase">Year</label>
+                                    <select x-model.number="calendarYear" @change="loadStats()" class="rounded-xl border-slate-200 text-sm font-semibold text-slate-800 min-w-[120px]">
+                                        <template x-for="y in yearChoices" :key="y">
+                                            <option :value="y" x-text="y"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-4" x-show="period === 'year'" x-cloak>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase">Year</label>
+                                    <select x-model.number="calendarYear" @change="loadStats()" class="rounded-xl border-slate-200 text-sm font-semibold text-slate-800 min-w-[120px]">
+                                        <template x-for="y in yearChoices" :key="y">
+                                            <option :value="y" x-text="y"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500" x-show="stats?.filter?.label">
+                                Showing <span class="font-bold text-slate-800" x-text="stats?.filter?.label"></span>
+                            </p>
+                        </div>
+
                         <!-- Summary cards -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             <!-- Total parcels -->
                             <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
                                 <div class="flex justify-between items-start mb-4">
                                     <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
                                     </div>
-                                    <span class="text-[11px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">Total</span>
+                                    <span class="text-[11px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">All time</span>
                                 </div>
                                 <h3 class="text-sm font-bold text-slate-500 mb-1">Total Parcels</h3>
                                 <p class="text-3xl font-black text-slate-900" x-text="stats?.totals?.parcels ?? '—'">—</p>
                             </div>
 
-                            <!-- Today -->
+                            <!-- All-time revenue -->
                             <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
                                 <div class="flex justify-between items-start mb-4">
                                     <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-banknote"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
                                     </div>
-                                    <span class="text-[11px] font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">Today</span>
+                                    <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">All time</span>
                                 </div>
-                                <h3 class="text-sm font-bold text-slate-500 mb-1">Today's Parcels</h3>
-                                <p class="text-3xl font-black text-slate-900" x-text="stats?.today?.count ?? '—'">—</p>
-                                <p class="text-xs text-slate-500 mt-1">
-                                    Revenue: 
-                                    <span class="font-semibold" x-text="formatCurrency(stats?.today?.amount)">TZS 0</span>
-                                </p>
+                                <h3 class="text-sm font-bold text-slate-500 mb-1">Total Revenue</h3>
+                                <p class="text-2xl font-black text-slate-900" x-text="formatCurrency(stats?.totals?.revenue)">TZS 0</p>
                             </div>
 
-                            <!-- This week -->
-                            <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
+                            <!-- Selected period -->
+                            <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all ring-1 ring-blue-100">
                                 <div class="flex justify-between items-start mb-4">
                                     <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-range"><path d="M4 10h16"/><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg>
                                     </div>
-                                    <span class="text-[11px] font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded-lg">This Week</span>
+                                    <span class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg max-w-[10rem] truncate" x-text="periodBadge"></span>
                                 </div>
-                                <h3 class="text-sm font-bold text-slate-500 mb-1">Week Parcels</h3>
-                                <p class="text-3xl font-black text-slate-900" x-text="stats?.week?.count ?? '—'">—</p>
+                                <h3 class="text-sm font-bold text-slate-500 mb-1">Parcels in period</h3>
+                                <p class="text-3xl font-black text-slate-900" x-text="stats?.filter?.count ?? '—'">—</p>
                                 <p class="text-xs text-slate-500 mt-1">
-                                    Revenue: 
-                                    <span class="font-semibold" x-text="formatCurrency(stats?.week?.amount)">TZS 0</span>
+                                    Revenue:
+                                    <span class="font-semibold" x-text="formatCurrency(stats?.filter?.amount)">TZS 0</span>
                                 </p>
-                            </div>
-
-                            <!-- This month / year toggle -->
-                            <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div class="p-3 bg-orange-50 text-orange-600 rounded-xl">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up"><path d="M3 17 9 11 13 15 21 7"/><path d="M14 7h7v7"/></svg>
-                                    </div>
-                                    <div class="flex gap-1 rounded-full bg-slate-100 p-1 text-[10px] font-bold">
-                                        <button 
-                                            type="button" 
-                                            @click="range = 'month'"
-                                            :class="range === 'month' ? 'bg-white text-slate-900 shadow-sm px-2 py-0.5 rounded-full' : 'px-2 py-0.5 text-slate-500'"
-                                        >
-                                            Month
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            @click="range = 'year'"
-                                            :class="range === 'year' ? 'bg-white text-slate-900 shadow-sm px-2 py-0.5 rounded-full' : 'px-2 py-0.5 text-slate-500'"
-                                        >
-                                            Year
-                                        </button>
-                                    </div>
-                                </div>
-                                <template x-if="range === 'month'">
-                                    <div>
-                                        <h3 class="text-sm font-bold text-slate-500 mb-1">This Month Parcels</h3>
-                                        <p class="text-3xl font-black text-slate-900" x-text="stats?.month?.count ?? '—'">—</p>
-                                        <p class="text-xs text-slate-500 mt-1">
-                                            Revenue: 
-                                            <span class="font-semibold" x-text="formatCurrency(stats?.month?.amount)">TZS 0</span>
-                                        </p>
-                                    </div>
-                                </template>
-                                <template x-if="range === 'year'">
-                                    <div>
-                                        <h3 class="text-sm font-bold text-slate-500 mb-1">This Year Parcels</h3>
-                                        <p class="text-3xl font-black text-slate-900" x-text="stats?.year?.count ?? '—'">—</p>
-                                        <p class="text-xs text-slate-500 mt-1">
-                                            Revenue: 
-                                            <span class="font-semibold" x-text="formatCurrency(stats?.year?.amount)">TZS 0</span>
-                                        </p>
-                                    </div>
-                                </template>
                             </div>
                         </div>
 
@@ -278,25 +285,25 @@
                             <!-- Chart -->
                             <div class="xl:col-span-2 bg-white rounded-3xl border shadow-sm p-6">
                                 <div class="flex items-center justify-between mb-4">
-                                    <h2 class="text-sm font-bold text-slate-900">Parcels (last 7 days)</h2>
+                                    <h2 class="text-sm font-bold text-slate-900" x-text="chartTitle">Parcels</h2>
                                 </div>
-                                <template x-if="stats">
-                                    <div class="h-56 flex items-end gap-2">
-                                        <template x-for="(label, idx) in stats.chart.labels" :key="idx">
-                                            <div class="flex-1 flex flex-col items-center justify-end group">
+                                <template x-if="stats && chartLabels.length">
+                                    <div class="h-56 flex items-end gap-1 sm:gap-2 overflow-x-auto pb-1">
+                                        <template x-for="(label, idx) in chartLabels" :key="idx">
+                                            <div class="flex-1 min-w-[1.25rem] flex flex-col items-center justify-end group">
                                                 <div class="w-full bg-blue-100 rounded-t-xl overflow-hidden relative">
                                                     <div 
                                                         class="w-full bg-blue-500 rounded-t-xl transition-all duration-500"
-                                                        :style="`height: ${barHeight(stats.chart.counts[idx])}%;`"
+                                                        :style="`height: ${barHeight(chartCounts[idx])}%;`"
                                                     ></div>
                                                 </div>
-                                                <span class="mt-2 text-[10px] font-bold text-slate-500 group-hover:text-slate-900" x-text="label"></span>
-                                                <span class="text-[10px] text-slate-400" x-text="stats.chart.counts[idx]"></span>
+                                                <span class="mt-2 text-[10px] font-bold text-slate-500 group-hover:text-slate-900 truncate max-w-full" x-text="label"></span>
+                                                <span class="text-[10px] text-slate-400" x-text="chartCounts[idx]"></span>
                                             </div>
                                         </template>
                                     </div>
                                 </template>
-                                <template x-if="!stats">
+                                <template x-if="!stats || !chartLabels.length">
                                     <div class="h-56 flex items-center justify-center text-slate-400 text-sm">
                                         Loading chart...
                                     </div>
@@ -328,50 +335,32 @@
                             </div>
                         </div>
 
-                        <!-- Recent activity table -->
-                        <div class="bg-white rounded-3xl border shadow-sm overflow-hidden">
-                            <div class="p-6 border-b flex items-center justify-between">
-                                <h2 class="text-sm font-bold text-slate-900">Recent Parcels Activity</h2>
+                        <!-- Parcels in period: jQuery DataTables -->
+                        <div class="bg-white rounded-3xl border shadow-sm overflow-hidden" x-show="stats?.filter" x-cloak>
+                            <div class="p-6 border-b border-slate-100 space-y-1">
+                                <h2 class="text-sm font-bold text-slate-900">Parcels in selected period</h2>
+                                <p class="text-xs text-slate-500">
+                                    Fee splits from settings:
+                                    TRA <span class="font-bold text-slate-700" x-text="stats?.filter?.tra_percent ?? '—'"></span>%
+                                    · Developer <span class="font-bold text-slate-700" x-text="stats?.filter?.developer_percent ?? '—'"></span>%.
+                                    <span class="text-slate-400">Remain = Amount − TRA − Dev.</span>
+                                </p>
                             </div>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full text-left text-sm">
-                                    <thead class="bg-slate-50 border-b">
+                            <div class="p-4 overflow-x-auto">
+                                <table id="admin-period-parcels-dt" class="display stripe hover cell-border w-full text-sm" style="width:100%">
+                                    <thead>
                                         <tr>
-                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Tracking</th>
-                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">From / To</th>
-                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Amount</th>
-                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Status</th>
-                                            <th class="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400">Created</th>
+                                            <th>Tracking</th>
+                                            <th>Route</th>
+                                            <th class="text-right">Amount</th>
+                                            <th class="text-right">TRA</th>
+                                            <th class="text-right">Dev</th>
+                                            <th class="text-right">Remain</th>
+                                            <th>Status</th>
+                                            <th>Created</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <template x-if="stats && stats.recent_parcels.length">
-                                            <template x-for="item in stats.recent_parcels" :key="item.id">
-                                                <tr class="border-b last:border-0 hover:bg-slate-50/60">
-                                                    <td class="px-4 py-2 font-mono text-xs text-slate-800" x-text="item.tracking_number"></td>
-                                                    <td class="px-4 py-2 text-xs text-slate-700">
-                                                        <div class="font-semibold" x-text="item.sender_name + ' → ' + item.receiver_name"></div>
-                                                        <div class="text-[11px] text-slate-500" x-text="item.origin + ' → ' + item.destination"></div>
-                                                    </td>
-                                                    <td class="px-4 py-2 text-xs font-semibold text-emerald-700" x-text="formatCurrency(item.amount)"></td>
-                                                    <td class="px-4 py-2">
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest"
-                                                            :class="statusClass(item.status)">
-                                                            <span x-text="item.status"></span>
-                                                        </span>
-                                                    </td>
-                                                    <td class="px-4 py-2 text-[11px] text-slate-500" x-text="item.created_at"></td>
-                                                </tr>
-                                            </template>
-                                        </template>
-                                        <template x-if="!stats || !stats.recent_parcels.length">
-                                            <tr>
-                                                <td colspan="5" class="px-4 py-10 text-center text-xs text-slate-400">
-                                                    No recent parcels yet.
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
@@ -388,17 +377,63 @@
                     </div>
                     <script>
                         function dashboardStats() {
+                            const now = new Date();
                             return {
                                 stats: null,
                                 loading: false,
-                                range: 'month',
+                                period: 'month',
+                                calendarYear: now.getFullYear(),
+                                calendarMonth: now.getMonth() + 1,
+                                periodOptions: [
+                                    { key: 'day', label: 'Today' },
+                                    { key: 'week', label: 'This week' },
+                                    { key: 'month', label: 'Month' },
+                                    { key: 'year', label: 'Year' },
+                                ],
+                                monthOptions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                                get yearChoices() {
+                                    const y = new Date().getFullYear();
+                                    return Array.from({ length: 11 }, (_, i) => y - i);
+                                },
+                                get periodBadge() {
+                                    const labels = { day: 'Today', week: 'This week', month: 'Month', year: 'Year' };
+                                    return labels[this.period] || this.period;
+                                },
+                                get chartLabels() {
+                                    if (!this.stats) return [];
+                                    const fc = this.stats.filtered_chart;
+                                    const c = this.stats.chart;
+                                    return (fc && fc.labels) ? fc.labels : (c && c.labels) ? c.labels : [];
+                                },
+                                get chartCounts() {
+                                    if (!this.stats) return [];
+                                    const fc = this.stats.filtered_chart;
+                                    const c = this.stats.chart;
+                                    return (fc && fc.counts) ? fc.counts : (c && c.counts) ? c.counts : [];
+                                },
+                                get chartTitle() {
+                                    if (this.stats && this.stats.filter) {
+                                        return 'Parcels · ' + this.stats.filter.label;
+                                    }
+                                    return 'Parcels (last 7 days)';
+                                },
+                                monthName(m) {
+                                    return new Date(2000, m - 1, 1).toLocaleString('en', { month: 'long' });
+                                },
+                                setPeriod(key) {
+                                    this.period = key;
+                                    this.loadStats();
+                                },
                                 async loadStats() {
                                     this.loading = true;
                                     try {
-                                        const response = await fetch('{{ route('dashboard.stats') }}', {
-                                            headers: {
-                                                'Accept': 'application/json',
-                                            },
+                                        const params = new URLSearchParams({
+                                            period: this.period,
+                                            year: String(this.calendarYear),
+                                            month: String(this.calendarMonth),
+                                        });
+                                        const response = await fetch('{{ route('dashboard.stats') }}?' + params.toString(), {
+                                            headers: { 'Accept': 'application/json' },
                                             credentials: 'same-origin',
                                         });
                                         const data = await response.json();
@@ -409,7 +444,86 @@
                                         console.error('Failed to load dashboard stats', e);
                                     } finally {
                                         this.loading = false;
+                                        queueMicrotask(() => this.syncPeriodParcelsDataTable());
                                     }
+                                },
+                                syncPeriodParcelsDataTable() {
+                                    const $ = window.jQuery;
+                                    if (!$ || !$.fn.DataTable) {
+                                        return;
+                                    }
+                                    const el = document.getElementById('admin-period-parcels-dt');
+                                    if (!el) {
+                                        return;
+                                    }
+                                    const rows = (this.stats && this.stats.filtered_period_parcels)
+                                        ? this.stats.filtered_period_parcels
+                                        : [];
+                                    if ($.fn.DataTable.isDataTable(el)) {
+                                        $(el).DataTable().destroy();
+                                        $(el).find('tbody').empty();
+                                    }
+                                    const fmt = (n) => {
+                                        const num = Number(n) || 0;
+                                        return 'TZS ' + num.toLocaleString('en-TZ', { maximumFractionDigits: 0 });
+                                    };
+                                    const esc = (s) => {
+                                        if (s === null || s === undefined) {
+                                            return '';
+                                        }
+                                        return String(s)
+                                            .replace(/&/g, '&amp;')
+                                            .replace(/</g, '&lt;')
+                                            .replace(/>/g, '&gt;')
+                                            .replace(/"/g, '&quot;');
+                                    };
+                                    const badgeClass = (status) => this.statusClass(status);
+                                    $(el).DataTable({
+                                        data: rows,
+                                        columns: [
+                                            { data: 'tracking_number', className: 'font-mono text-xs', render: (d) => esc(d) },
+                                            {
+                                                data: null,
+                                                render: (row) => esc(row.origin || '') + ' → ' + esc(row.destination || ''),
+                                            },
+                                            {
+                                                data: 'amount',
+                                                className: 'text-right font-semibold text-emerald-800',
+                                                render: (d) => fmt(d),
+                                            },
+                                            {
+                                                data: 'tra_amount',
+                                                className: 'text-right text-amber-900',
+                                                render: (d) => fmt(d),
+                                            },
+                                            {
+                                                data: 'developer_amount',
+                                                className: 'text-right text-violet-900',
+                                                render: (d) => fmt(d),
+                                            },
+                                            {
+                                                data: 'remain_amount',
+                                                className: 'text-right font-bold text-slate-900',
+                                                render: (d) => fmt(d),
+                                            },
+                                            {
+                                                data: 'status',
+                                                render: (d) => {
+                                                    const c = badgeClass(d);
+                                                    return '<span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ' + c + '">' + esc(d) + '</span>';
+                                                },
+                                            },
+                                            { data: 'created_at', render: (d) => esc(d) },
+                                        ],
+                                        order: [[7, 'desc']],
+                                        pageLength: 25,
+                                        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']],
+                                        scrollX: true,
+                                        language: {
+                                            emptyTable: 'No parcels in this period.',
+                                            zeroRecords: 'No matching parcels.',
+                                        },
+                                    });
                                 },
                                 formatCurrency(value) {
                                     if (value === null || value === undefined) return 'TZS 0';
@@ -417,9 +531,8 @@
                                     return 'TZS ' + num.toLocaleString('en-TZ', { maximumFractionDigits: 0 });
                                 },
                                 barHeight(count) {
-                                    const max = this.stats && this.stats.chart && this.stats.chart.counts.length
-                                        ? Math.max(...this.stats.chart.counts)
-                                        : 0;
+                                    const counts = this.chartCounts;
+                                    const max = counts.length ? Math.max(...counts) : 0;
                                     if (!max) return 5;
                                     return 10 + (count / max) * 80;
                                 },
@@ -450,3 +563,30 @@
         </main>
     </div>
 </x-layouts.admin>
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+    <style>
+        #admin-period-parcels-dt_wrapper .dataTables_filter input {
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            padding: 0.35rem 0.65rem;
+            margin-left: 0.5rem;
+        }
+        #admin-period-parcels-dt_wrapper .dataTables_length select {
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            padding: 0.25rem 0.5rem;
+        }
+        table.dataTable thead th {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+        }
+    </style>
+@endpush
+@push('scripts')
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+@endpush

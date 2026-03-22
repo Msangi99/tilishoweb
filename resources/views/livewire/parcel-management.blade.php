@@ -183,7 +183,18 @@
                                     class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 gap-6 max-w-md">
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Travel
+                                        date</label>
+                                    <input wire:model="travel_date" type="date"
+                                        class="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                                    @error('travel_date') <span
+                                    class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="space-y-1.5">
                                     <label
                                         class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Amount
@@ -191,15 +202,6 @@
                                     <input wire:model="amount" type="number" step="0.01"
                                         class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                                     @error('amount') <span
-                                    class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
-                                </div>
-                                <div class="space-y-1.5">
-                                    <label
-                                        class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Travel
-                                        Date</label>
-                                    <input wire:model="travel_date" type="date"
-                                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                                    @error('travel_date') <span
                                     class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">

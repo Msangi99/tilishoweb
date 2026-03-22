@@ -54,4 +54,30 @@
             </button>
         </div>
     </form>
+
+    <form wire:submit.prevent="saveFeePercentages" class="space-y-8">
+        <fieldset class="p-8 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-6">
+            <legend class="px-3 text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] bg-white ml-2">Parcel fee splits (TRA &amp; developer)</legend>
+            <p class="text-xs text-slate-500 -mt-2">Applied to each parcel <span class="font-semibold text-slate-700">amount</span> when viewing fee transactions.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-700 px-1">TRA share (%)</label>
+                    <input wire:model="fee_tra_percent" type="number" step="0.01" min="0" max="100"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                    @error('fee_tra_percent') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-700 px-1">Developer share (%)</label>
+                    <input wire:model="fee_developer_percent" type="number" step="0.01" min="0" max="100"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 outline-none transition-all text-sm font-bold text-slate-900">
+                    @error('fee_developer_percent') <span class="text-[10px] text-red-500 font-bold px-1">{{ $message }}</span> @enderror
+                </div>
+            </div>
+        </fieldset>
+        <div class="flex justify-end pt-4">
+            <button type="submit" class="px-8 py-4 bg-slate-900 hover:bg-slate-850 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20">
+                Save fee percentages
+            </button>
+        </div>
+    </form>
 </div>

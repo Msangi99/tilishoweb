@@ -48,6 +48,7 @@ class ApiAuthController extends Controller
                     'phone' => $user->phone,
                     'username' => $user->username,
                     'role' => $user->role,
+                    'created_at' => $user->created_at?->toIso8601String(),
                 ],
             ],
         ]);
@@ -71,6 +72,7 @@ class ApiAuthController extends Controller
                     'phone' => $user->phone,
                     'username' => $user->username,
                     'role' => $user->role,
+                    'created_at' => $user->created_at?->toIso8601String(),
                 ],
                 'assigned_bus' => $bus ? [
                     'id' => $bus->id,
@@ -124,6 +126,7 @@ class ApiAuthController extends Controller
                     'phone' => $user->phone,
                     'username' => $user->username,
                     'role' => $user->role,
+                    'created_at' => $user->created_at?->toIso8601String(),
                 ],
             ],
         ]);

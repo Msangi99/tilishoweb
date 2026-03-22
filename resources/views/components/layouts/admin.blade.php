@@ -11,6 +11,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
+        @stack('styles')
         
         <!-- Select2 assets -->
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -49,6 +50,7 @@
     </head>
     <body class="font-sans antialiased bg-slate-50 text-foreground overflow-y-scroll">
         {{ $slot }}
+        @stack('scripts')
         @livewireScripts
     </body>
 </html>

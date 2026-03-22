@@ -37,6 +37,11 @@
                             @error('phone') <span class="text-[10px] text-red-500 font-bold ml-1">{{ $message }}</span> @enderror
                         </div>
                     </div>
+
+                    <div class="flex items-center gap-3 px-1 py-2 rounded-xl bg-slate-50/80 border border-slate-100">
+                        <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest shrink-0">Member since</span>
+                        <span class="text-sm font-bold text-slate-700">{{ auth()->user()->created_at?->format('M j, Y') ?? '—' }}</span>
+                    </div>
                 </div>
                 <div class="px-8 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
                     <button type="submit" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-slate-900/20">
