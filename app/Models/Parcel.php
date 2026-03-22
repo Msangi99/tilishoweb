@@ -8,6 +8,10 @@ class Parcel extends Model
 {
     protected $fillable = [
         'tracking_number',
+        'parcel_name',
+        'quantity',
+        'weight_band',
+        'creator_office',
         'sender_name',
         'sender_phone',
         'receiver_name',

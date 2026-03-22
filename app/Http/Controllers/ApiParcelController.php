@@ -80,6 +80,10 @@ class ApiParcelController extends Controller
         $user = $request->user();
         
         $validated = $request->validate([
+            'parcel_name' => 'required|string|max:255',
+            'quantity' => 'required|integer|min:1|max:999999',
+            'weight_band' => 'required|string|in:under_20kg,over_20kg',
+            'creator_office' => 'required|string|max:255',
             'sender_name' => 'required|string|max:255',
             'sender_phone' => 'required|string|max:20',
             'receiver_name' => 'required|string|max:255',
@@ -96,6 +100,10 @@ class ApiParcelController extends Controller
         ]);
 
         $parcel = Parcel::create([
+            'parcel_name' => $validated['parcel_name'],
+            'quantity' => $validated['quantity'],
+            'weight_band' => $validated['weight_band'],
+            'creator_office' => $validated['creator_office'],
             'sender_name' => $validated['sender_name'],
             'sender_phone' => $validated['sender_phone'],
             'receiver_name' => $validated['receiver_name'],

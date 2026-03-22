@@ -109,6 +109,47 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="space-y-1.5">
                                     <label
+                                        class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Parcel
+                                        name</label>
+                                    <input wire:model="parcel_name" type="text"
+                                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        placeholder="e.g. Box, suitcase">
+                                    @error('parcel_name') <span
+                                    class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Creator
+                                        office</label>
+                                    <input wire:model="creator_office" type="text"
+                                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        placeholder="Office where parcel is registered">
+                                    @error('creator_office') <span
+                                    class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Quantity</label>
+                                    <input wire:model="quantity" type="number" min="1" step="1"
+                                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                                    @error('quantity') <span
+                                    class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Weight</label>
+                                    <select wire:model="weight_band"
+                                        class="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm font-bold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                                        <option value="under_20kg">Less than 20 kg</option>
+                                        <option value="over_20kg">20 kg or more</option>
+                                    </select>
+                                    @error('weight_band') <span
+                                    class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-1.5">
+                                    <label
                                         class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">Origin
                                         (From)</label>
                                     <div wire:ignore>
@@ -288,6 +329,10 @@
                                             <div class="flex flex-col">
                                                 <span
                                                     class="text-xs font-black text-slate-900">{{ $parcel->tracking_number }}</span>
+                                                @if($parcel->parcel_name)
+                                                    <span
+                                                        class="text-[10px] text-slate-600 font-semibold line-clamp-1">{{ $parcel->parcel_name }}</span>
+                                                @endif
                                                 <span
                                                     class="text-[10px] text-slate-400 font-bold">{{ $parcel->created_at->format('M d, H:i') }}</span>
                                             </div>
@@ -507,6 +552,30 @@
 
                             <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-10">
                                 <div class="space-y-6">
+                                    @if($viewingParcel->parcel_name || $viewingParcel->quantity || $viewingParcel->weight_band || $viewingParcel->creator_office)
+                                        <div class="space-y-2 md:col-span-2">
+                                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Parcel
+                                                item</p>
+                                            @if($viewingParcel->parcel_name)
+                                                <p class="text-sm font-semibold text-slate-900">{{ $viewingParcel->parcel_name }}</p>
+                                            @endif
+                                            <p class="text-xs text-slate-600">
+                                                @if($viewingParcel->quantity)
+                                                    Qty: <span class="font-mono font-semibold">{{ $viewingParcel->quantity }}</span>
+                                                @endif
+                                                @if($viewingParcel->weight_band)
+                                                    @if($viewingParcel->quantity) · @endif
+                                                    Weight:
+                                                    <span class="font-semibold">{{ $viewingParcel->weight_band === 'over_20kg' ? '20 kg or more' : 'Less than 20 kg' }}</span>
+                                                @endif
+                                            </p>
+                                            @if($viewingParcel->creator_office)
+                                                <p class="text-xs text-slate-600">
+                                                    Creator office: <span class="font-semibold">{{ $viewingParcel->creator_office }}</span>
+                                                </p>
+                                            @endif
+                                        </div>
+                                    @endif
                                     <div class="space-y-2">
                                         <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Sender</p>
                                         <p class="text-sm font-semibold text-slate-900">{{ $viewingParcel->sender_name }}</p>

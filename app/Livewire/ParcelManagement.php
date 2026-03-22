@@ -45,6 +45,10 @@ class ParcelManagement extends Component
     public $destination;
     public $amount;
     public $description;
+    public $parcel_name;
+    public $quantity = 1;
+    public $weight_band = 'under_20kg';
+    public $creator_office;
     public $bus_id;
     public $travel_date;
 
@@ -70,6 +74,10 @@ class ParcelManagement extends Component
     public function rules()
     {
         return [
+            'parcel_name' => 'required|string|max:255',
+            'quantity' => 'required|integer|min:1|max:999999',
+            'weight_band' => 'required|string|in:under_20kg,over_20kg',
+            'creator_office' => 'required|string|max:255',
             'sender_name' => 'required|string|max:255',
             'sender_phone' => 'required|string|max:20',
             'receiver_name' => 'required|string|max:255',
@@ -130,6 +138,10 @@ class ParcelManagement extends Component
         $this->receiver_phone = $parcel->receiver_phone;
         $this->origin = $parcel->origin;
         $this->destination = $parcel->destination;
+        $this->parcel_name = $parcel->parcel_name;
+        $this->quantity = $parcel->quantity ?? 1;
+        $this->weight_band = $parcel->weight_band ?? 'under_20kg';
+        $this->creator_office = $parcel->creator_office;
         $this->amount = $parcel->amount;
         $this->description = $parcel->description;
         $this->status = $parcel->status;
@@ -139,7 +151,9 @@ class ParcelManagement extends Component
 
     public function cancelEdit()
     {
-        $this->reset(['editingParcelId', 'sender_name', 'sender_phone', 'receiver_name', 'receiver_phone', 'origin', 'destination', 'amount', 'description', 'status', 'bus_id', 'travel_date']);
+        $this->reset(['editingParcelId', 'sender_name', 'sender_phone', 'receiver_name', 'receiver_phone', 'origin', 'destination', 'amount', 'description', 'status', 'bus_id', 'travel_date', 'parcel_name', 'creator_office']);
+        $this->quantity = 1;
+        $this->weight_band = 'under_20kg';
         $this->travel_date = now()->format('Y-m-d');
         $this->resetErrorBag();
     }
@@ -153,6 +167,10 @@ class ParcelManagement extends Component
             session()->flash('message', 'Editing existing parcels is not allowed.');
         } else {
             Parcel::create([
+                'parcel_name' => $this->parcel_name,
+                'quantity' => $this->quantity,
+                'weight_band' => $this->weight_band,
+                'creator_office' => $this->creator_office,
                 'sender_name' => $this->sender_name,
                 'sender_phone' => $this->sender_phone,
                 'receiver_name' => $this->receiver_name,
@@ -184,10 +202,12 @@ class ParcelManagement extends Component
         return view('livewire.parcel-management', [
             'parcels' => Parcel::where(function($query) {
                     $query->where('tracking_number', 'like', '%' . $this->search . '%')
+                        ->orWhere('parcel_name', 'like', '%' . $this->search . '%')
                         ->orWhere('sender_name', 'like', '%' . $this->search . '%')
                         ->orWhere('receiver_name', 'like', '%' . $this->search . '%')
                         ->orWhere('origin', 'like', '%' . $this->search . '%')
-                        ->orWhere('destination', 'like', '%' . $this->search . '%');
+                        ->orWhere('destination', 'like', '%' . $this->search . '%')
+                        ->orWhere('creator_office', 'like', '%' . $this->search . '%');
                 })
                 ->latest()
                 ->paginate($this->perPage),

@@ -12,8 +12,11 @@ class ParcelSmsComposer
         $shipDate = $this->shipDate($parcel);
         $route = strtoupper(($parcel->origin ?? '').' - '.($parcel->destination ?? ''));
         $cargo = $this->cargo($parcel);
-        $qty = 1;
+        $qty = (int) ($parcel->quantity ?? 1);
         $fare = $this->fare($parcel);
+        $weight = $this->weightLabel($parcel);
+        $office = trim((string) ($parcel->creator_office ?? ''));
+        $officeLine = $office !== '' ? "\nOffice: {$office}" : '';
 
         return trim("TILISHO PARCEL
 Hi, {$parcel->sender_name}
@@ -22,7 +25,8 @@ Hi, {$parcel->sender_name}
 recever: {$parcel->receiver_name} - {$parcel->receiver_phone}
 Ship Date: {$shipDate}
 Cargo: {$cargo}
-Qty: ({$qty})
+Weight: {$weight}
+Qty: ({$qty}){$officeLine}
 Fare: {$fare}
 
 BOOK US ONLINE
@@ -37,8 +41,11 @@ Msaada:0750015630");
         $shipDate = $this->shipDate($parcel);
         $route = strtoupper(($parcel->origin ?? '').' - '.($parcel->destination ?? ''));
         $cargo = $this->cargo($parcel);
-        $qty = 1;
+        $qty = (int) ($parcel->quantity ?? 1);
         $fare = $this->fare($parcel);
+        $weight = $this->weightLabel($parcel);
+        $office = trim((string) ($parcel->creator_office ?? ''));
+        $officeLine = $office !== '' ? "\nOffice: {$office}" : '';
 
         return trim("TILISHO PARCEL
 Hi, {$parcel->receiver_name}
@@ -47,7 +54,8 @@ Hi, {$parcel->receiver_name}
 Sender: {$parcel->sender_name} - {$parcel->sender_phone}
 Ship Date: {$shipDate}
 Cargo: {$cargo}
-Qty: ({$qty})
+Weight: {$weight}
+Qty: ({$qty}){$officeLine}
 Fare: {$fare}
 
 BOOK US ONLINE
@@ -61,9 +69,13 @@ Msaada:0750015630");
     {
         $shipDate = $this->shipDate($parcel);
         $cargo = $this->cargo($parcel);
-        $qty = 1;
+        $qty = (int) ($parcel->quantity ?? 1);
         $fare = $this->fare($parcel);
-        $office = $parcel->destination ;
+        $office = $parcel->destination;
+        $creatorOffice = trim((string) ($parcel->creator_office ?? ''));
+        if ($creatorOffice !== '') {
+            $office = $creatorOffice;
+        }
 
         return trim("TILISHO PARCEL
 Habari {$parcel->receiver_name}, mzigo wako {$parcel->tracking_number} kutoka kwa {$parcel->sender_name} upo ofisini {$office}
@@ -86,9 +98,22 @@ Web: www.tilishosafari.co.tz");
 
     private function cargo(Parcel $parcel): string
     {
+        $name = trim((string) ($parcel->parcel_name ?? ''));
+        if ($name !== '') {
+            return $name;
+        }
         $d = trim((string) ($parcel->description ?? ''));
 
         return $d !== '' ? $d : 'mzigo';
+    }
+
+    private function weightLabel(Parcel $parcel): string
+    {
+        return match ($parcel->weight_band) {
+            'over_20kg' => '20kg+',
+            'under_20kg' => '<20kg',
+            default => '—',
+        };
     }
 
     private function fare(Parcel $parcel): string

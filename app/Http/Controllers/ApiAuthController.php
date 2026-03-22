@@ -130,6 +130,30 @@ class ApiAuthController extends Controller
     }
 
     /**
+     * Confirm the current user's password (e.g. before sensitive actions).
+     */
+    public function verifyPassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string',
+        ]);
+
+        $user = $request->user();
+
+        if (! Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Password si sahihi.',
+            ], 422);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password imethibitishwa.',
+        ]);
+    }
+
+    /**
      * Logout — revoke the current token.
      */
     public function logout(Request $request)
