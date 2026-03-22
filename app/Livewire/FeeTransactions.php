@@ -5,7 +5,9 @@ namespace App\Livewire;
 use App\Models\FeeWithdrawal;
 use App\Models\Parcel;
 use App\Models\SystemSetting;
+use App\Models\Wallet;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class FeeTransactions extends Component
@@ -80,19 +82,23 @@ class FeeTransactions extends Component
             'withdrawNote' => 'nullable|string|max:500',
         ]);
 
-        FeeWithdrawal::create([
-            'type' => $this->modalType,
-            'amount' => $this->withdrawAmount,
-            'note' => $this->withdrawNote !== '' ? $this->withdrawNote : null,
-            'recorded_by' => auth()->id(),
-        ]);
+        DB::transaction(function () {
+            Wallet::debitForWithdrawal($this->modalType, (float) $this->withdrawAmount);
+
+            FeeWithdrawal::create([
+                'type' => $this->modalType,
+                'amount' => $this->withdrawAmount,
+                'note' => $this->withdrawNote !== '' ? $this->withdrawNote : null,
+                'recorded_by' => auth()->id(),
+            ]);
+        });
 
         session()->flash('fee_message', 'Withdrawal recorded successfully.');
         $this->closeModal();
     }
 
     /**
-     * @return array{start: \Carbon\Carbon, end: \Carbon\Carbon, label: string}
+     * @return array{start: Carbon, end: Carbon, label: string}
      */
     protected function dateRange(): array
     {
@@ -139,6 +145,8 @@ class FeeTransactions extends Component
 
     public function render()
     {
+        $wallet = Wallet::instance();
+
         $range = $this->dateRange();
         $start = $range['start'];
         $end = $range['end'];
@@ -176,7 +184,13 @@ class FeeTransactions extends Component
         $y0 = (int) Carbon::now()->year;
         $years = collect(range(0, 10))->map(fn (int $i) => $y0 - $i)->all();
 
+        $allWithdrawals = FeeWithdrawal::query()
+            ->with('recordedBy')
+            ->orderByDesc('created_at')
+            ->get();
+
         return view('livewire.fee-transactions', [
+            'wallet' => $wallet,
             'rangeLabel' => $range['label'],
             'parcelSum' => $parcelSum,
             'traPct' => $traPct,
@@ -187,6 +201,7 @@ class FeeTransactions extends Component
             'developerWithdrawn' => (float) $developerWithdrawn,
             'modalWithdrawals' => $modalWithdrawals,
             'yearChoices' => $years,
+            'allWithdrawals' => $allWithdrawals,
         ]);
     }
 }

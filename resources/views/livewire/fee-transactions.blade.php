@@ -1,4 +1,4 @@
-<div class="space-y-8">
+<div class="space-y-8" data-fee-withdrawals-root>
     <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h2 class="text-2xl font-bold text-slate-900">TRA &amp; developer fees</h2>
@@ -69,8 +69,20 @@
         </p>
     </div>
 
-    <!-- Summary cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Wallet balances (from wallets table) + TRA / developer actions -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="text-left bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-slate-100 text-slate-700 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide lucide-building-2"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+                </div>
+                <span class="text-[10px] font-black text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">System</span>
+            </div>
+            <h3 class="text-sm font-bold text-slate-500 mb-1">System wallet</h3>
+            <p class="text-3xl font-black text-slate-900">TZS {{ number_format((float) $wallet->system, 0) }}</p>
+            <p class="text-xs text-slate-500 mt-2">Remaining parcel share after TRA &amp; developer splits (all time).</p>
+        </div>
+
         <button
             type="button"
             wire:click="openModal('tra')"
@@ -82,9 +94,9 @@
                 </div>
                 <span class="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 rounded-lg">{{ $traPct }}% · TRA</span>
             </div>
-            <h3 class="text-sm font-bold text-slate-500 mb-1">TRA share (accrual)</h3>
-            <p class="text-3xl font-black text-slate-900">TZS {{ number_format($traAccrued, 0) }}</p>
-            <p class="text-xs text-slate-500 mt-2">Withdrawn this period: <span class="font-semibold text-slate-700">TZS {{ number_format($traWithdrawn, 0) }}</span></p>
+            <h3 class="text-sm font-bold text-slate-500 mb-1">TRA wallet balance</h3>
+            <p class="text-3xl font-black text-slate-900">TZS {{ number_format((float) $wallet->tra, 0) }}</p>
+            <p class="text-xs text-slate-500 mt-2">Accrued this period: <span class="font-semibold text-slate-700">TZS {{ number_format($traAccrued, 0) }}</span> · Withdrawn: <span class="font-semibold text-slate-700">TZS {{ number_format($traWithdrawn, 0) }}</span></p>
             <p class="text-[11px] text-amber-700 font-bold mt-4 opacity-0 group-hover:opacity-100 transition-opacity">Click to record withdrawal →</p>
         </button>
 
@@ -99,9 +111,9 @@
                 </div>
                 <span class="text-[10px] font-black text-violet-600 bg-violet-50 px-2 py-1 rounded-lg">{{ $devPct }}% · Developer</span>
             </div>
-            <h3 class="text-sm font-bold text-slate-500 mb-1">Developer share (accrual)</h3>
-            <p class="text-3xl font-black text-slate-900">TZS {{ number_format($developerAccrued, 0) }}</p>
-            <p class="text-xs text-slate-500 mt-2">Withdrawn this period: <span class="font-semibold text-slate-700">TZS {{ number_format($developerWithdrawn, 0) }}</span></p>
+            <h3 class="text-sm font-bold text-slate-500 mb-1">Developer wallet balance</h3>
+            <p class="text-3xl font-black text-slate-900">TZS {{ number_format((float) $wallet->developer, 0) }}</p>
+            <p class="text-xs text-slate-500 mt-2">Accrued this period: <span class="font-semibold text-slate-700">TZS {{ number_format($developerAccrued, 0) }}</span> · Withdrawn: <span class="font-semibold text-slate-700">TZS {{ number_format($developerWithdrawn, 0) }}</span></p>
             <p class="text-[11px] text-violet-700 font-bold mt-4 opacity-0 group-hover:opacity-100 transition-opacity">Click to record withdrawal →</p>
         </button>
     </div>
@@ -124,6 +136,12 @@
                 </div>
 
                 <div class="p-6 space-y-4 border-b border-slate-100 bg-slate-50/80">
+                    <p class="text-xs text-slate-600">
+                        Wallet balance (available):
+                        <span class="font-black text-slate-900">
+                            TZS {{ number_format($modalType === 'tra' ? (float) $wallet->tra : (float) $wallet->developer, 0) }}
+                        </span>
+                    </p>
                     <p class="text-xs text-slate-600">
                         Accrual this period:
                         <span class="font-black text-slate-900">
@@ -190,4 +208,78 @@
             </div>
         </div>
     @endif
+
+    <!-- Withdrawal ledger (jQuery DataTables) -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-lg font-black text-slate-900">Withdrawal transactions</h3>
+            <p class="text-xs text-slate-500 mt-1">All recorded TRA and developer withdrawals (sortable &amp; searchable).</p>
+        </div>
+        <div class="p-4 sm:p-6 overflow-x-auto">
+            <table id="jquerytabledata" class="display nowrap w-full text-left text-sm" style="width:100%">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="px-3 py-2 font-bold text-slate-600">Date</th>
+                        <th class="px-3 py-2 font-bold text-slate-600">Type</th>
+                        <th class="px-3 py-2 font-bold text-slate-600">Amount (TZS)</th>
+                        <th class="px-3 py-2 font-bold text-slate-600">Note</th>
+                        <th class="px-3 py-2 font-bold text-slate-600">Recorded by</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($allWithdrawals as $w)
+                        <tr>
+                            <td class="px-3 py-2 text-slate-700 whitespace-nowrap">{{ $w->created_at->format('Y-m-d H:i') }}</td>
+                            <td class="px-3 py-2">
+                                <span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md {{ $w->type === 'tra' ? 'bg-amber-100 text-amber-800' : 'bg-violet-100 text-violet-800' }}">
+                                    {{ $w->type === 'tra' ? 'TRA' : 'Developer' }}
+                                </span>
+                            </td>
+                            <td class="px-3 py-2 font-bold text-slate-900">{{ number_format((float) $w->amount, 2) }}</td>
+                            <td class="px-3 py-2 text-slate-600 max-w-xs truncate" title="{{ $w->note }}">{{ $w->note ?? '—' }}</td>
+                            <td class="px-3 py-2 text-slate-600">{{ $w->recordedBy?->name ?? '—' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+@once
+    @push('styles')
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+    @endpush
+
+    @push('scripts')
+        <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+        <script>
+            (function () {
+                function tilishoInitWithdrawalsDataTable() {
+                    var $t = window.jQuery('#jquerytabledata');
+                    if (!$t.length) return;
+                    if (window.jQuery.fn.dataTable.isDataTable($t)) {
+                        $t.DataTable().destroy();
+                    }
+                    $t.DataTable({
+                        order: [[0, 'desc']],
+                        pageLength: 10,
+                        responsive: true,
+                    });
+                }
+
+                document.addEventListener('DOMContentLoaded', tilishoInitWithdrawalsDataTable);
+                document.addEventListener('livewire:navigated', tilishoInitWithdrawalsDataTable);
+                document.addEventListener('livewire:init', function () {
+                    Livewire.hook('morph.updated', function (_ref) {
+                        var el = _ref.el;
+                        if (!el || !el.querySelector) return;
+                        if (el.querySelector('#jquerytabledata') || el.id === 'jquerytabledata') {
+                            tilishoInitWithdrawalsDataTable();
+                        }
+                    });
+                });
+            })();
+        </script>
+    @endpush
+@endonce
