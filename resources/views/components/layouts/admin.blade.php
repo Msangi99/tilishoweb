@@ -48,7 +48,7 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased bg-slate-50 text-foreground overflow-y-scroll">
+    <body class="font-sans antialiased bg-slate-50 text-slate-900 overflow-y-scroll">
         {{ $slot }}
         @stack('scripts')
         @livewireScripts

@@ -1,10 +1,20 @@
 <x-layouts.admin>
-    <div class="min-h-screen bg-slate-50 p-6 md:p-10 max-w-3xl mx-auto space-y-8">
+    @push('styles')
+        <style>
+            /* Native selects ignore many utilities in some browsers; force readable contrast */
+            #web-artisan-migration-path,
+            #web-artisan-migration-path option {
+                color: #0f172a;
+                background-color: #ffffff;
+            }
+        </style>
+    @endpush
+    <div class="min-h-screen bg-slate-50 p-6 md:p-10 max-w-3xl mx-auto space-y-8 text-slate-900">
         <div>
             <h1 class="text-2xl font-black text-slate-900">Artisan (web)</h1>
-            <p class="text-sm text-slate-500 mt-1">
-                Whitelisted commands only. Requires <code class="text-xs bg-slate-200 px-1 rounded">ALLOW_WEB_COMMANDS=true</code> and local environment (or
-                <code class="text-xs bg-slate-200 px-1 rounded">ALLOW_WEB_COMMANDS_IN_PRODUCTION=true</code>).
+            <p class="text-sm text-slate-600 mt-1">
+                Whitelisted commands only. Requires <code class="text-xs bg-slate-200 text-slate-900 px-1 rounded font-mono">ALLOW_WEB_COMMANDS=true</code> and local environment (or
+                <code class="text-xs bg-slate-200 text-slate-900 px-1 rounded font-mono">ALLOW_WEB_COMMANDS_IN_PRODUCTION=true</code>).
             </p>
         </div>
 
@@ -48,12 +58,12 @@
 
             <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
                 <h2 class="text-sm font-black text-slate-900 uppercase tracking-widest">Migrate single file</h2>
-                <p class="text-xs text-slate-500">Runs <code class="bg-slate-100 px-1 rounded">php artisan migrate --path=… --force</code></p>
+                <p class="text-xs text-slate-600">Runs <code class="bg-slate-100 text-slate-900 px-1 rounded font-mono">php artisan migrate --path=… --force</code></p>
                 <form method="post" action="{{ route('command.migrate-path') }}" class="space-y-3">
                     @csrf
                     <div>
-                        <label for="path" class="text-[10px] font-bold text-slate-500 uppercase">Path</label>
-                        <select name="path" id="path" class="mt-1 w-full rounded-xl border-slate-200 text-sm font-semibold text-slate-900" @disabled(count($migrationFiles) === 0)>
+                        <label for="web-artisan-migration-path" class="text-[10px] font-bold text-slate-700 uppercase">Path</label>
+                        <select name="path" id="web-artisan-migration-path" class="mt-1 w-full rounded-xl border border-slate-300 bg-white py-2 px-3 text-sm font-semibold text-slate-900 shadow-sm" @disabled(count($migrationFiles) === 0)>
                             @forelse ($migrationFiles as $file)
                                 <option value="{{ $file }}">{{ $file }}</option>
                             @empty
