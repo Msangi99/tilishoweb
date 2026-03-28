@@ -195,7 +195,6 @@
                                 @if($bus->route)
                                     <div class="flex flex-col">
                                         <span class="text-xs font-bold text-slate-900">{{ $bus->route->from }} → {{ $bus->route->to }}</span>
-                                        <span class="text-[9px] text-slate-400 font-medium truncate max-w-[150px]">{{ $bus->route->stations }}</span>
                                     </div>
                                 @else
                                     <span class="text-[10px] text-slate-400 italic font-medium">Not Assigned</span>

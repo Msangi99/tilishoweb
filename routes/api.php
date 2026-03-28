@@ -28,4 +28,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/parcels/assign-receiver', [ApiParcelController::class, 'assignReceiver']);
     Route::get('/buses', [ApiParcelController::class, 'getBuses']);
     Route::get('/routes', [ApiParcelController::class, 'getRoutes']);
+    Route::get('/offices', [ApiParcelController::class, 'getOffices']);
 });

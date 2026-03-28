@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Bus;
+use App\Models\BusRoute;
+use App\Models\Office;
 use App\Models\Parcel;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
@@ -17,16 +19,10 @@ class ParcelManagement extends Component
 
     public function getStations()
     {
-        return \App\Models\BusRoute::all()->flatMap(function ($route) {
-            $list = [$route->from, $route->to];
-            if ($route->stations) {
-                $extra = explode(',', $route->stations);
-                foreach ($extra as $e) {
-                    $list[] = trim($e);
-                }
-            }
-            return $list;
-        })->unique()->filter()->sort()->values();
+        $endpoints = BusRoute::all()->flatMap(fn ($route) => [$route->from, $route->to]);
+        $offices = Office::query()->pluck('name');
+
+        return $endpoints->merge($offices)->unique()->filter()->sort()->values();
     }
     
     public $status = 'pending';

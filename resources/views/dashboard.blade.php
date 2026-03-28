@@ -69,6 +69,13 @@
                     <span class="text-sm">Manage Routes</span>
                 </a>
 
+                <a href="{{ route('dashboard', ['view' => 'offices']) }}" 
+                   @click="sidebarOpen = false"
+                   class="flex items-center gap-3 px-4 py-3 {{ request()->query('view') == 'offices' ? 'bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white rounded-xl transition-all group' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building-2 {{ request()->query('view') == 'offices' ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+                    <span class="text-sm">Offices</span>
+                </a>
+
                 <a href="{{ route('dashboard', ['view' => 'settings']) }}" 
                    @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-4 py-3 {{ request()->query('view') == 'settings' ? 'bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white rounded-xl transition-all group' }}">
@@ -174,6 +181,8 @@
                     <livewire:bus-management />
                 @elseif(request()->query('view') == 'routes')
                     <livewire:route-management />
+                @elseif(request()->query('view') == 'offices' && Auth::user()->role == 'admin')
+                    <livewire:office-management />
                 @elseif(request()->query('view') == 'settings' && Auth::user()->role == 'admin')
                     <livewire:system-settings />
                 @elseif(request()->query('view') == 'fees' && Auth::user()->role == 'admin')

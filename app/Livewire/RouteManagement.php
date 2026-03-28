@@ -15,11 +15,10 @@ class RouteManagement extends Component
 
     public $search = '';
     public $perPage = 10;
-    
+
     public $editingRouteId;
     public $from;
     public $to;
-    public $stations;
 
     public $locations = [
         'Arusha',
@@ -61,7 +60,6 @@ class RouteManagement extends Component
     protected $rules = [
         'from' => 'required|string|max:255',
         'to' => 'required|string|max:255',
-        'stations' => 'nullable|string',
     ];
 
     public function updatingSearch()
@@ -74,17 +72,16 @@ class RouteManagement extends Component
         $this->showList = false;
         $this->editingRouteId = $id;
         $route = BusRoute::findOrFail($id);
-        
+
         $this->from = $route->from;
         $this->to = $route->to;
-        $this->stations = $route->stations;
 
         $this->dispatch('init-route-select2');
     }
 
     public function cancelEdit()
     {
-        $this->reset(['editingRouteId', 'from', 'to', 'stations']);
+        $this->reset(['editingRouteId', 'from', 'to']);
         $this->resetErrorBag();
     }
 
@@ -110,14 +107,12 @@ class RouteManagement extends Component
             $route->update([
                 'from' => $this->from,
                 'to' => $this->to,
-                'stations' => $this->stations,
             ]);
             session()->flash('message', 'Route updated successfully.');
         } else {
             BusRoute::create([
                 'from' => $this->from,
                 'to' => $this->to,
-                'stations' => $this->stations,
             ]);
             session()->flash('message', 'Route added successfully.');
         }
@@ -135,13 +130,12 @@ class RouteManagement extends Component
     public function render()
     {
         return view('livewire.route-management', [
-            'routes' => BusRoute::where(function($query) {
-                    $query->where('from', 'like', '%' . $this->search . '%')
-                        ->orWhere('to', 'like', '%' . $this->search . '%')
-                        ->orWhere('stations', 'like', '%' . $this->search . '%');
-                })
+            'routes' => BusRoute::where(function ($query) {
+                $query->where('from', 'like', '%'.$this->search.'%')
+                    ->orWhere('to', 'like', '%'.$this->search.'%');
+            })
                 ->latest()
-                ->paginate($this->perPage)
+                ->paginate($this->perPage),
         ]);
     }
 }

@@ -9,6 +9,5 @@ class BusRoute extends Model
     protected $fillable = [
         'from',
         'to',
-        'stations',
     ];
 }

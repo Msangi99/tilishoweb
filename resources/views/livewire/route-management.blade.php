@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-2xl font-bold text-slate-900 font-inter">Manage Routes</h2>
-            <p class="text-sm text-slate-500">Define and manage bus routes and their stations.</p>
+            <p class="text-sm text-slate-500">Define bus route origin and destination. Intermediate stations are managed under <span class="font-semibold text-slate-700">Offices</span>.</p>
         </div>
         @if($showList)
         <button wire:click="showCreateForm" class="flex items-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/10">
@@ -25,7 +25,7 @@
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
                     <div>
                         <h3 class="text-sm font-bold text-slate-900">{{ $editingRouteId ? 'Edit Bus Route' : 'Add New Route' }}</h3>
-                        <p class="text-[11px] text-slate-500 font-medium">Configure origin, destination and stop points.</p>
+                        <p class="text-[11px] text-slate-500 font-medium">Configure origin and destination only.</p>
                     </div>
                     @if (session()->has('message'))
                         <span class="text-[11px] font-semibold text-emerald-600">{{ session('message') }}</span>
@@ -54,13 +54,6 @@
                             </select>
                             @error('to') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                         </div>
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-semibold text-slate-700 px-0.5">Intermediate Stations</label>
-                        <textarea wire:model="stations" rows="3" class="w-full px-4 py-2.5 rounded-md border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="e.g. Chalinze, Segera, Korogwe... (separate with commas)"></textarea>
-                        <p class="text-[9px] text-slate-400 px-0.5 mt-1 font-medium italic">Separate each station name using a comma (,)</p>
-                        @error('stations') <span class="text-[9px] text-red-500 font-black px-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="pt-4 flex gap-3">
@@ -111,7 +104,6 @@
                     <tr class="border-b bg-white">
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">Origin (From)</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">Destination (To)</th>
-                        <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">Stations</th>
                         <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-slate-400 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -129,17 +121,6 @@
                             <td class="px-6 py-4">
                                 <span class="text-sm font-bold text-slate-900">{{ $route->to }}</span>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="flex flex-wrap gap-1">
-                                    @php $route_stations = array_filter(explode(',', $route->stations)); @endphp
-                                    @foreach(array_slice($route_stations, 0, 3) as $st)
-                                        <span class="text-[10px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">{{ trim($st) }}</span>
-                                    @endforeach
-                                    @if(count($route_stations) > 3)
-                                        <span class="text-[10px] font-black text-blue-600 px-1">+{{ count($route_stations) - 3 }} more</span>
-                                    @endif
-                                </div>
-                            </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1">
                                     <button wire:click="editRoute({{ $route->id }})" class="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all">
@@ -153,7 +134,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-20 text-center">
+                            <td colspan="3" class="px-6 py-20 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>

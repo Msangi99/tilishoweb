@@ -24,7 +24,7 @@ class BusRouteSeeder extends Seeder
         foreach ($routes as $r) {
             BusRoute::firstOrCreate(
                 ['from' => $r['from'], 'to' => $r['to']],
-                ['stations' => '']
+                []
             );
         }
 

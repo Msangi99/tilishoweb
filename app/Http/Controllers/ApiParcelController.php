@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Parcel;
 use App\Models\Bus;
 use App\Models\BusRoute;
+use App\Models\Office;
 use App\Models\User;
 use App\Services\Sms\ParcelSmsComposer;
 use App\Services\Sms\SmsCoTzClient;
@@ -377,6 +378,21 @@ class ApiParcelController extends Controller
             'status' => 'success',
             'data' => [
                 'routes' => $routes,
+            ],
+        ]);
+    }
+
+    /**
+     * Offices / intermediate stations (for parcel app pickers).
+     */
+    public function getOffices()
+    {
+        $offices = Office::query()->orderBy('name')->get(['id', 'name']);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'offices' => $offices,
             ],
         ]);
     }
