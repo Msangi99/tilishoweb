@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\Sms\ParcelSmsComposer;
 use App\Services\Sms\SmsCoTzClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 class ApiParcelController extends Controller
@@ -387,6 +388,15 @@ class ApiParcelController extends Controller
      */
     public function getOffices()
     {
+        if (! Schema::hasTable('offices')) {
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'offices' => [],
+                ],
+            ]);
+        }
+
         $offices = Office::query()->orderBy('name')->get(['id', 'name']);
 
         return response()->json([

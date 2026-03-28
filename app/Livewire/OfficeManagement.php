@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Office;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -38,6 +40,10 @@ class OfficeManagement extends Component
 
     public function editOffice($id): void
     {
+        if (! Schema::hasTable('offices')) {
+            return;
+        }
+
         $this->showList = false;
         $this->resetErrorBag();
         $this->editingOfficeId = $id;
@@ -65,6 +71,12 @@ class OfficeManagement extends Component
 
     public function saveOffice(): void
     {
+        if (! Schema::hasTable('offices')) {
+            session()->flash('message', 'Database is not ready: run php artisan migrate on the server to create the offices table.');
+
+            return;
+        }
+
         $this->validate();
 
         $name = trim($this->name);
@@ -83,12 +95,23 @@ class OfficeManagement extends Component
 
     public function deleteOffice($id): void
     {
+        if (! Schema::hasTable('offices')) {
+            return;
+        }
+
         Office::findOrFail($id)->delete();
         session()->flash('message', 'Office deleted successfully.');
     }
 
     public function render()
     {
+        if (! Schema::hasTable('offices')) {
+            return view('livewire.office-management', [
+                'offices' => new LengthAwarePaginator([], 0, max(1, (int) $this->perPage)),
+                'officesTableMissing' => true,
+            ]);
+        }
+
         return view('livewire.office-management', [
             'offices' => Office::query()
                 ->when($this->search !== '', function ($q) {
@@ -96,6 +119,7 @@ class OfficeManagement extends Component
                 })
                 ->orderBy('name')
                 ->paginate($this->perPage),
+            'officesTableMissing' => false,
         ]);
     }
 }

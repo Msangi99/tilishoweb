@@ -1,4 +1,10 @@
 <div class="space-y-6">
+    @if(!empty($officesTableMissing))
+        <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <p class="font-bold">Offices table not found</p>
+            <p class="mt-1 text-amber-800/90">On the server, run <code class="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">php artisan migrate</code> so the <code class="font-mono text-xs">offices</code> table is created. Until then, the parcel app will load without office-based stops.</p>
+        </div>
+    @endif
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-2xl font-bold text-slate-900 font-inter">Offices &amp; intermediate stations</h2>

@@ -6,6 +6,7 @@ use App\Models\Bus;
 use App\Models\BusRoute;
 use App\Models\Office;
 use App\Models\Parcel;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -20,9 +21,11 @@ class ParcelManagement extends Component
     public function getStations()
     {
         $endpoints = BusRoute::all()->flatMap(fn ($route) => [$route->from, $route->to]);
-        $offices = Office::query()->pluck('name');
+        $officeNames = Schema::hasTable('offices')
+            ? Office::query()->pluck('name')
+            : collect();
 
-        return $endpoints->merge($offices)->unique()->filter()->sort()->values();
+        return $endpoints->merge($officeNames)->unique()->filter()->sort()->values();
     }
     
     public $status = 'pending';
