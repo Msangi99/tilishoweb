@@ -196,7 +196,7 @@
                     <!-- Admin Dashboard (powered by API stats) -->
                     <div 
                         x-data="dashboardStats()" 
-                        x-init="loadStats()"
+                        x-init="initDashboard()"
                         class="space-y-10"
                     >
                         <!-- Period filter -->
@@ -246,46 +246,30 @@
                             </p>
                         </div>
 
-                        <!-- Summary cards -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <!-- Total parcels -->
-                            <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
+                        <!-- Summary cards (parcel metrics follow selected period; staff block below is unfiltered) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Parcels in selected period -->
+                            <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all ring-1 ring-blue-100">
                                 <div class="flex justify-between items-start mb-4">
                                     <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
                                     </div>
-                                    <span class="text-[11px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">All time</span>
+                                    <span class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg max-w-[10rem] truncate" x-text="parcelMetricBadge"></span>
                                 </div>
-                                <h3 class="text-sm font-bold text-slate-500 mb-1">Total Parcels</h3>
-                                <p class="text-3xl font-black text-slate-900" x-text="stats?.totals?.parcels ?? '—'">—</p>
+                                <h3 class="text-sm font-bold text-slate-500 mb-1">Parcels</h3>
+                                <p class="text-3xl font-black text-slate-900" x-text="parcelCountDisplay">—</p>
                             </div>
 
-                            <!-- All-time revenue -->
+                            <!-- Revenue in selected period -->
                             <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
                                 <div class="flex justify-between items-start mb-4">
                                     <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-banknote"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
                                     </div>
-                                    <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">All time</span>
+                                    <span class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg max-w-[10rem] truncate" x-text="parcelMetricBadge"></span>
                                 </div>
-                                <h3 class="text-sm font-bold text-slate-500 mb-1">Total Revenue</h3>
-                                <p class="text-2xl font-black text-slate-900" x-text="formatCurrency(stats?.totals?.revenue)">TZS 0</p>
-                            </div>
-
-                            <!-- Selected period -->
-                            <div class="group bg-white p-7 rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all ring-1 ring-blue-100">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-range"><path d="M4 10h16"/><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg>
-                                    </div>
-                                    <span class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg max-w-[10rem] truncate" x-text="periodBadge"></span>
-                                </div>
-                                <h3 class="text-sm font-bold text-slate-500 mb-1">Parcels in period</h3>
-                                <p class="text-3xl font-black text-slate-900" x-text="stats?.filter?.count ?? '—'">—</p>
-                                <p class="text-xs text-slate-500 mt-1">
-                                    Revenue:
-                                    <span class="font-semibold" x-text="formatCurrency(stats?.filter?.amount)">TZS 0</span>
-                                </p>
+                                <h3 class="text-sm font-bold text-slate-500 mb-1">Revenue</h3>
+                                <p class="text-2xl font-black text-slate-900" x-text="revenueDisplay">TZS 0</p>
                             </div>
                         </div>
 
@@ -296,32 +280,24 @@
                                 <div class="flex items-center justify-between mb-4">
                                     <h2 class="text-sm font-bold text-slate-900" x-text="chartTitle">Parcels</h2>
                                 </div>
-                                <template x-if="stats && chartLabels.length">
-                                    <div class="h-56 flex items-end gap-1 sm:gap-2 overflow-x-auto pb-1">
-                                        <template x-for="(label, idx) in chartLabels" :key="idx">
-                                            <div class="flex-1 min-w-[1.25rem] flex flex-col items-center justify-end group">
-                                                <div class="w-full bg-blue-100 rounded-t-xl overflow-hidden relative">
-                                                    <div 
-                                                        class="w-full bg-blue-500 rounded-t-xl transition-all duration-500"
-                                                        :style="`height: ${barHeight(chartCounts[idx])}%;`"
-                                                    ></div>
-                                                </div>
-                                                <span class="mt-2 text-[10px] font-bold text-slate-500 group-hover:text-slate-900 truncate max-w-full" x-text="label"></span>
-                                                <span class="text-[10px] text-slate-400" x-text="chartCounts[idx]"></span>
-                                            </div>
-                                        </template>
+                                <div class="relative w-full min-h-[280px]">
+                                    <div id="dashboard-parcels-line-chart" class="w-full min-h-[280px]" aria-label="Parcels line chart"></div>
+                                    <div
+                                        x-show="!stats || !chartLabels.length"
+                                        x-cloak
+                                        class="absolute inset-0 flex items-center justify-center bg-white text-slate-400 text-sm rounded-xl"
+                                    >
+                                        Loading chart…
                                     </div>
-                                </template>
-                                <template x-if="!stats || !chartLabels.length">
-                                    <div class="h-56 flex items-center justify-center text-slate-400 text-sm">
-                                        Loading chart...
-                                    </div>
-                                </template>
+                                </div>
                             </div>
 
-                            <!-- Staff summary -->
+                            <!-- Staff summary (global user counts — not scoped by dashboard period) -->
                             <div class="bg-white rounded-3xl border shadow-sm p-6 space-y-4">
-                                <h2 class="text-sm font-bold text-slate-900 mb-2">Staff Overview</h2>
+                                <div class="mb-2">
+                                    <h2 class="text-sm font-bold text-slate-900">Staff Overview</h2>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">User totals are not filtered by period</p>
+                                </div>
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-xs text-slate-500">Total Staff</p>
@@ -441,9 +417,24 @@
                                     const y = new Date().getFullYear();
                                     return Array.from({ length: 11 }, (_, i) => y - i);
                                 },
-                                get periodBadge() {
-                                    const labels = { day: 'Today', week: 'This week', month: 'Month', year: 'Year' };
-                                    return labels[this.period] || this.period;
+                                get parcelMetricBadge() {
+                                    return (this.stats && this.stats.filter && this.stats.filter.label)
+                                        ? this.stats.filter.label
+                                        : 'All time';
+                                },
+                                get parcelCountDisplay() {
+                                    if (!this.stats) return '—';
+                                    if (this.stats.filter && this.stats.filter.count !== undefined) {
+                                        return this.stats.filter.count;
+                                    }
+                                    return this.stats.totals?.parcels ?? '—';
+                                },
+                                get revenueDisplay() {
+                                    if (!this.stats) return this.formatCurrency(0);
+                                    const amt = this.stats.filter && this.stats.filter.amount !== undefined
+                                        ? this.stats.filter.amount
+                                        : this.stats.totals?.revenue;
+                                    return this.formatCurrency(amt);
                                 },
                                 get chartLabels() {
                                     if (!this.stats) return [];
@@ -498,6 +489,88 @@
                                     this.period = key;
                                     this.loadStats();
                                 },
+                                async ensureGoogleCharts() {
+                                    if (!window.__tilishoGChartsCoreReady) {
+                                        window.__tilishoGChartsCoreReady = (async () => {
+                                            if (!document.getElementById('gcharts-loader')) {
+                                                await new Promise((resolve, reject) => {
+                                                    const s = document.createElement('script');
+                                                    s.id = 'gcharts-loader';
+                                                    s.src = 'https://www.gstatic.com/charts/loader.js';
+                                                    s.async = true;
+                                                    s.onload = resolve;
+                                                    s.onerror = () => reject(new Error('Google Charts failed to load'));
+                                                    document.head.appendChild(s);
+                                                });
+                                            } else {
+                                                while (!window.google) {
+                                                    await new Promise((r) => setTimeout(r, 30));
+                                                }
+                                            }
+                                            await new Promise((resolve) => {
+                                                google.charts.load('current', { packages: ['corechart'] });
+                                                google.charts.setOnLoadCallback(resolve);
+                                            });
+                                        })();
+                                    }
+                                    await window.__tilishoGChartsCoreReady;
+                                },
+                                drawGoogleLineChart() {
+                                    const el = document.getElementById('dashboard-parcels-line-chart');
+                                    if (!el || !window.google || !google.visualization) {
+                                        return;
+                                    }
+                                    const labels = this.chartLabels;
+                                    const counts = this.chartCounts;
+                                    if (!labels.length) {
+                                        return;
+                                    }
+                                    const table = new google.visualization.DataTable();
+                                    table.addColumn('string', 'Period');
+                                    table.addColumn('number', 'Parcels');
+                                    table.addRows(
+                                        labels.map((label, i) => [String(label), Number(counts[i]) || 0])
+                                    );
+                                    const options = {
+                                        curveType: 'function',
+                                        legend: { position: 'none' },
+                                        colors: ['#3b82f6'],
+                                        backgroundColor: 'transparent',
+                                        chartArea: { left: 56, top: 12, right: 24, bottom: 48, height: '75%', width: '88%' },
+                                        height: 300,
+                                        hAxis: {
+                                            textStyle: { color: '#64748b', fontSize: 11 },
+                                            slantedText: labels.length > 10,
+                                            slantedTextAngle: labels.length > 10 ? 45 : 0,
+                                        },
+                                        vAxis: {
+                                            minValue: 0,
+                                            format: '0',
+                                            baselineColor: '#e2e8f0',
+                                            gridlines: { color: '#f1f5f9' },
+                                            textStyle: { color: '#64748b', fontSize: 11 },
+                                        },
+                                        lineWidth: 3,
+                                        pointSize: 5,
+                                    };
+                                    if (!this._parcelsLineChart) {
+                                        this._parcelsLineChart = new google.visualization.LineChart(el);
+                                    }
+                                    this._parcelsLineChart.draw(table, options);
+                                },
+                                scheduleDrawChart() {
+                                    requestAnimationFrame(() => {
+                                        requestAnimationFrame(() => this.drawGoogleLineChart());
+                                    });
+                                },
+                                async initDashboard() {
+                                    try {
+                                        await this.ensureGoogleCharts();
+                                    } catch (e) {
+                                        console.error(e);
+                                    }
+                                    await this.loadStats();
+                                },
                                 async loadStats() {
                                     this.loading = true;
                                     try {
@@ -513,6 +586,7 @@
                                         const data = await response.json();
                                         if (data.status === 'success') {
                                             this.stats = data.data;
+                                            this.scheduleDrawChart();
                                         }
                                     } catch (e) {
                                         console.error('Failed to load dashboard stats', e);
@@ -524,12 +598,6 @@
                                     if (value === null || value === undefined) return 'TZS 0';
                                     const num = Number(value) || 0;
                                     return 'TZS ' + num.toLocaleString('en-TZ', { maximumFractionDigits: 0 });
-                                },
-                                barHeight(count) {
-                                    const counts = this.chartCounts;
-                                    const max = counts.length ? Math.max(...counts) : 0;
-                                    if (!max) return 5;
-                                    return 10 + (count / max) * 80;
                                 },
                                 statusClass(status) {
                                     const value = (status || '').toLowerCase();
